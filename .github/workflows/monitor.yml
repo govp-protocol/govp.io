@@ -28,14 +28,24 @@ jobs:
       - name: Install the exact public verifier
         run: python -m pip install --disable-pip-version-check govp==0.1.11
 
+      - name: Resolve the current release record from discovery
+        id: release
+        run: |
+          record_url="$(curl --fail --silent --show-error \
+            https://govp.io/.well-known/govp/index.json \
+            | python -c 'import json, sys; payload=json.load(sys.stdin); matches=[item["record"] for item in payload["records"] if item["asset"] == "https://github.com/govp-protocol/govp/releases/download/v0.1.11/GOVP-0.1.11-source.zip" and item["asset_sha256"] == "89d45080fbdff7cca7efbaf1027d205ed14295c1d33e6a35be4722bb88c0296a"]; assert len(matches) == 1; print(matches[0])')"
+          echo "record_url=${record_url}" >> "$GITHUB_OUTPUT"
+
       - name: Verify canonical identity, discovered record and live status
+        env:
+          RELEASE_RECORD_URL: ${{ steps.release.outputs.record_url }}
         run: |
           govp verify-url https://govp.io/.well-known/govp.txt
           govp verify-url https://govp.io/.well-known/govp/GOVP-DOC-1863bfac05f9.govp
-          govp verify-url https://govp.io/.well-known/govp/GOVP-DOC-2f134146263e.govp
+          govp verify-url "$RELEASE_RECORD_URL"
           govp status-url https://govp.io/.well-known/govp.txt \
             --status-url https://govp.io/.well-known/govp/revoked.json
-          govp status-url https://govp.io/.well-known/govp/GOVP-DOC-2f134146263e.govp \
+          govp status-url "$RELEASE_RECORD_URL" \
             --status-url https://govp.io/.well-known/govp/revoked.json
 
       - name: Validate public HTTP contracts

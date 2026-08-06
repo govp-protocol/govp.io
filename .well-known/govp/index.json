@@ -1,7 +1,7 @@
 {
   "canonical": "https://govp.io/.well-known/govp.txt",
   "format": "GOVP-DISCOVERY-1",
-  "generated_at": "2026-08-05T22:33:28Z",
+  "generated_at": "2026-08-06T13:55:04Z",
   "publisher": "govp.io",
   "status": "https://govp.io/.well-known/govp/revoked.json",
   "records": [
@@ -12,10 +12,10 @@
       "record": "https://govp.io/.well-known/govp/GOVP-DOC-1863bfac05f9.govp"
     },
     {
-      "asset": "https://github.com/govp-protocol/govp/releases/download/v0.1.10/GOVP-0.1.10-source.zip",
-      "asset_sha256": "25b1c21a734ff5f6ef56bbeafa0f570c5159ca512fc4b92c06cf34d2c4b6d6fe",
-      "govp_id": "GOVP-DOC-2f134146263e",
-      "record": "https://govp.io/.well-known/govp/GOVP-DOC-2f134146263e.govp"
+      "asset": "https://github.com/govp-protocol/govp/releases/download/v0.1.11/GOVP-0.1.11-source.zip",
+      "asset_sha256": "89d45080fbdff7cca7efbaf1027d205ed14295c1d33e6a35be4722bb88c0296a",
+      "govp_id": "GOVP-DOC-bce5b6208efe",
+      "record": "https://govp.io/.well-known/govp/GOVP-DOC-bce5b6208efe.govp"
     }
   ]
 }
