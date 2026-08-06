@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-GOVP_PACKAGE='govp==0.1.10'
+GOVP_PACKAGE='govp==0.1.11'
 
 printf '%s\n' 'Installing stable GOVP verifier from PyPI:'
 printf '  %s\n' "$GOVP_PACKAGE"

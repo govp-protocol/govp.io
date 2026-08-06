@@ -98,6 +98,9 @@ TABLE OF CONTENTS
    field name and value in JSON MUST be a string and MUST satisfy the same
    name and value restrictions as the text form. A bundle's asset type, id
    and SHA-256 value MUST equal the corresponding signed record fields.
+   A JSON record MUST reject two source property names that normalize or
+   alias to the same canonical field name. This rule does not alter the text
+   parser's last-occurrence-wins behavior in section 3.
 
 
 3.  PARSING
@@ -226,6 +229,13 @@ TABLE OF CONTENTS
    The signature is the 64-byte form, base64-encoded in "signature". No
    pre-hashing variant is used: the signing input is passed to Ed25519
    directly.
+
+   The encoded public key and the signature R component MUST be canonical
+   Edwards25519 encodings in the prime-order subgroup and MUST NOT encode the
+   identity. The signature scalar S MUST be less than the Ed25519 subgroup
+   order. A verifier MUST reject an input that violates any of these rules.
+   This strict profile prevents exceptional-point acceptance from depending
+   on the selected cryptographic runtime.
 
 
 7.  GOVP-ID DERIVATION
@@ -429,6 +439,12 @@ TABLE OF CONTENTS
 
 
 14. CHANGE LOG
+
+   2026-08   Verifier 0.1.11 security clarification: JSON property names that
+             collide after normalization are rejected, and the RFC 8032
+             verification profile explicitly requires canonical prime-order
+             encodings and a reduced scalar. Standard GOVP-1 signer output
+             and all previously published records are unchanged.
 
    2026-08   Verifier 0.1.8 publication hardening: made RFC 3339 fractional
              seconds version-independent; clarified RFC 3986 ASCII URI input;

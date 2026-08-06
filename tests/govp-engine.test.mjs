@@ -3,10 +3,12 @@ import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
 
 import {
+  evaluateStatus,
   loadJsonRecord,
   normalizeCanonical,
   normalizeFieldName,
   parseRecord,
+  parseStatus,
   signingInput,
   verifyFields,
   verifyText,
@@ -19,6 +21,10 @@ const textVectors = JSON.parse(await readFile(new URL(
 const jsonVectors = JSON.parse(await readFile(new URL(
   '../govp/conformance/json-vectors.json', import.meta.url,
 ), 'utf8'));
+const statusVectors = JSON.parse(await readFile(new URL(
+  '../govp/conformance/status-vectors.json', import.meta.url,
+), 'utf8'));
+const STATUS_NOW = Date.parse('2026-08-05T22:09:00Z');
 
 async function sha256Hex(bytes) {
   const digest = await crypto.subtle.digest('SHA-256', bytes);
@@ -56,6 +62,82 @@ test('all JSON conformance vectors load or reject identically', async () => {
       assert.throws(() => loadJsonRecord(vector.payload), new RegExp(vector.expected.error), vector.name);
     }
   }
+});
+
+test('status vectors, freshness and normalized aliases fail closed', async () => {
+  const record = await readFile(new URL('../.well-known/govp.txt', import.meta.url), 'utf8');
+  const statusText = await readFile(new URL('../.well-known/govp/revoked.json', import.meta.url), 'utf8');
+  const fields = parseRecord(record);
+  const status = parseStatus(statusText);
+
+  for (const vector of statusVectors.vectors) {
+    const result = await evaluateStatus(fields, vector.status);
+    assert.equal(result.checks['status-format'], vector.expected.schema_valid, vector.name);
+  }
+
+  const options = {
+    recordFetchedUrl: fields.canonical,
+    fetchedUrl: status.canonical,
+    now: STATUS_NOW,
+  };
+  const stale = await evaluateStatus(fields, {
+    ...status,
+    generated_at: '2026-08-05T22:03:59Z',
+  }, options);
+  assert.equal(stale.snapshotValid, true);
+  assert.equal(stale.snapshotTrusted, true);
+  assert.equal(stale.checks['status-fresh'], false);
+  assert.equal(stale.currentlyTrusted, false);
+
+  const future = await evaluateStatus(fields, {
+    ...status,
+    generated_at: '2026-08-05T22:10:01Z',
+  }, options);
+  assert.equal(future.checks['status-fresh'], false);
+  assert.equal(future.currentlyTrusted, false);
+
+  const revokedStatus = {
+    ...status,
+    generated_at: '2026-08-05T22:09:00Z',
+    revoked_records: [{
+      govp_id: fields['govp-id'],
+      revoked_at: '2026-08-05T22:08:00Z',
+      reason: 'withdrawn',
+    }],
+  };
+  const aliased = { ...fields, 'Govp-ID': fields['govp-id'] };
+  delete aliased['govp-id'];
+  const revoked = await evaluateStatus(aliased, revokedStatus, options);
+  assert.equal(revoked.checks.core, true);
+  assert.equal(revoked.checks['record-not-revoked'], false);
+  assert.equal(revoked.currentlyTrusted, false);
+});
+
+test('strict Ed25519 encodings reject identity points and non-canonical scalars', async () => {
+  const valid = textVectors.vectors.find((vector) => vector.expected.core_valid);
+  const fields = parseRecord(valid.record);
+  const identity = Buffer.concat([Buffer.from([1]), Buffer.alloc(31)]);
+  const signature = Buffer.from(fields.signature, 'base64');
+  const order = 2n ** 252n + 27742317777372353535851937790883648493n;
+  const highS = Buffer.alloc(32);
+  let scalar = order;
+  for (let index = 0; index < 32; index += 1) {
+    highS[index] = Number(scalar & 0xffn);
+    scalar >>= 8n;
+  }
+
+  assert.equal((await verifyFields({
+    ...fields,
+    'public-key': identity.toString('base64'),
+  })).checks.signature, false);
+  assert.equal((await verifyFields({
+    ...fields,
+    signature: Buffer.concat([identity, signature.subarray(32)]).toString('base64'),
+  })).checks.signature, false);
+  assert.equal((await verifyFields({
+    ...fields,
+    signature: Buffer.concat([signature.subarray(0, 32), highS]).toString('base64'),
+  })).checks.signature, false);
 });
 
 test('the browser controller verifies text records and JSON bundles', async () => {
@@ -159,7 +241,7 @@ test('format checks enforce RFC 3986 ASCII URLs and stable RFC 3339 fractions', 
   assert.equal((await verifyFields({ ...base, evidence: 'https://example.test/%zz' })).checks.format, false);
 });
 
-test('signed extensions, exact trimming and advisories match GOVP 0.1.10', async () => {
+test('signed extensions, exact trimming and advisories match GOVP 0.1.11', async () => {
   assert.equal(normalizeFieldName(' X-Évidence\u00a0'), 'x-Évidence');
   assert.match(new TextDecoder().decode(signingInput({ version: 'GOVP-1', __extension: 'signed' })), /__extension: signed/);
 

@@ -111,6 +111,26 @@ async function fetchAsset(env, origin, request, path) {
   return lastResponse;
 }
 
+async function fetchCurrentStatus(request, env, origin) {
+  const path = '/.well-known/govp/revoked.json';
+  const template = await env.ASSETS.fetch(new URL(path, origin));
+  if (template.status !== 200) return decorate(template, path);
+  let payload;
+  try {
+    payload = await template.json();
+  } catch {
+    return new Response('Invalid status template.\n', {
+      status: 500,
+      headers: SECURITY_HEADERS,
+    });
+  }
+  payload.generated_at = new Date().toISOString();
+  const headers = new Headers(template.headers);
+  for (const name of ['Content-Length', 'ETag', 'Last-Modified']) headers.delete(name);
+  const body = request.method === 'HEAD' ? null : `${JSON.stringify(payload, null, 2)}\n`;
+  return decorate(new Response(body, { status: 200, headers }), path);
+}
+
 function downloadContentType(key) {
   if (key.endsWith('.exe')) return 'application/vnd.microsoft.portable-executable';
   if (key.endsWith('.tar.gz')) return 'application/gzip';
@@ -194,6 +214,10 @@ export default {
       }
 
       if (path.startsWith(DOWNLOAD_PREFIX)) return fetchDownload(request, env, path);
+
+      if (path === '/.well-known/govp/revoked.json') {
+        return fetchCurrentStatus(request, env, url.origin);
+      }
 
       const response = await fetchAsset(env, url.origin, request, path);
       if (!response || response.status === 404) {
