@@ -191,17 +191,25 @@ test('govp.io publishes a valid canonical identity and discovery record', async 
   assert.equal(publishedResult.fields['govp-id'], result.fields['govp-id']);
   assert.notEqual(publishedCopy, record);
 
+  const releaseEntry = index.records.find((entry) => (
+    entry.asset === 'https://github.com/govp-protocol/govp/releases/download/v0.1.11/GOVP-0.1.11-source.zip'
+  ));
+  assert.ok(releaseEntry, 'the current 0.1.11 source release must be discoverable');
+  assert.equal(
+    releaseEntry.asset_sha256,
+    '89d45080fbdff7cca7efbaf1027d205ed14295c1d33e6a35be4722bb88c0296a',
+  );
   const releaseRecord = await readFile(new URL(
-    '../.well-known/govp/GOVP-DOC-2f134146263e.govp', import.meta.url,
+    `../.well-known/govp/${releaseEntry.govp_id}.govp`, import.meta.url,
   ), 'utf8');
   const releaseResult = await verifyText(releaseRecord, {
-    fetchedUrl: index.records[1].record,
+    fetchedUrl: releaseEntry.record,
   });
   assert.equal(releaseResult.ok, true);
   assert.equal(releaseResult.checks.signature, true);
   assert.equal(releaseResult.checks.canonical, true);
-  assert.equal(releaseResult.fields['asset-sha256'], index.records[1].asset_sha256);
-  assert.equal(releaseResult.fields['govp-id'], index.records[1].govp_id);
+  assert.equal(releaseResult.fields['asset-sha256'], releaseEntry.asset_sha256);
+  assert.equal(releaseResult.fields['govp-id'], releaseEntry.govp_id);
 
   const status = JSON.parse(await readFile(new URL(
     '../.well-known/govp/revoked.json', import.meta.url,
@@ -210,13 +218,20 @@ test('govp.io publishes a valid canonical identity and discovery record', async 
   assert.equal(status.canonical, index.status);
   assert.equal(status.authority, 'https-origin');
   assert.deepEqual(status.revoked_records, []);
-  assert.equal(status.keys.length, 1);
-  assert.equal(status.keys[0].public_key, result.fields['public-key']);
-  assert.equal(status.keys[0].state, 'active');
-  assert.equal(
-    status.keys[0].key_id,
-    `sha256:${await sha256Hex(Buffer.from(status.keys[0].public_key, 'base64'))}`,
-  );
+  assert.equal(status.keys.length, 2);
+  const expectedKeys = new Set([
+    result.fields['public-key'],
+    releaseResult.fields['public-key'],
+  ]);
+  for (const key of status.keys) {
+    assert.equal(expectedKeys.delete(key.public_key), true);
+    assert.equal(key.state, 'active');
+    assert.equal(
+      key.key_id,
+      `sha256:${await sha256Hex(Buffer.from(key.public_key, 'base64'))}`,
+    );
+  }
+  assert.equal(expectedKeys.size, 0);
 });
 
 test('canonical normalization preserves scheme, www, path and explicit port boundaries', () => {

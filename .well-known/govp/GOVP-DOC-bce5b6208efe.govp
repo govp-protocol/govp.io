@@ -1,0 +1,13 @@
+Version: GOVP-1
+Canonical: https://govp.io/.well-known/govp/GOVP-DOC-bce5b6208efe.govp
+Publisher: GOVP Protocol — Gemacode
+Asset-Type: document
+Asset-ID: govp-protocol/govp/v0.1.11/source
+Asset-SHA256: 89d45080fbdff7cca7efbaf1027d205ed14295c1d33e6a35be4722bb88c0296a
+License: Apache-2.0
+Profile: GOVP-RELEASE
+Generated-At: 2026-08-06T13:55:04Z
+GOVP-ID: GOVP-DOC-bce5b6208efe
+Evidence: https://github.com/govp-protocol/govp/releases/download/v0.1.11/GOVP-0.1.11-source.zip
+Public-Key: 3ssRh9xsWjxWlkK7zz6kpnCKCEdCr9ZfSR20e8g2Cic=
+Signature: A1fRjRmKecZY3GVmu3+grY51ezMuE9XS9M9d0+tbSoPgXeLdmowbaVy/dhPBMSYEm07QJbznT8ycxOTaHWiaCg==

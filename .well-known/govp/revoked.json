@@ -10,6 +10,12 @@
       "public_key": "jgLoQnTwnFLl8uXniEg2INX91Lxao1r8+ikmLQp8wOE=",
       "state": "active",
       "changed_at": "2026-08-05T20:58:38Z"
+    },
+    {
+      "key_id": "sha256:8a94ece8bca36850accdb79be665446bf7093e4d68b3d5673c208d24cbe04294",
+      "public_key": "3ssRh9xsWjxWlkK7zz6kpnCKCEdCr9ZfSR20e8g2Cic=",
+      "state": "active",
+      "changed_at": "2026-08-06T13:55:04Z"
     }
   ],
   "revoked_records": []
