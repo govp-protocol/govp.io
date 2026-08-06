@@ -28,6 +28,41 @@ jobs:
       - name: Install the exact public verifier
         run: python -m pip install --disable-pip-version-check govp==0.1.11
 
+      - name: Confirm current versions across distribution surfaces
+        env:
+          GOVP_PYTHON_VERSION: "0.1.11"
+          GOVP_JAVASCRIPT_VERSION: "0.1.8"
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from urllib.request import Request, urlopen
+
+          def get(url, *, as_json=False):
+              request = Request(url, headers={"User-Agent": "govp-public-monitor/1"})
+              with urlopen(request, timeout=20) as response:
+                  body = response.read()
+              return json.loads(body) if as_json else body.decode("utf-8")
+
+          py = os.environ["GOVP_PYTHON_VERSION"]
+          js = os.environ["GOVP_JAVASCRIPT_VERSION"]
+          assert get("https://pypi.org/pypi/govp/json", as_json=True)["info"]["version"] == py
+          assert get("https://registry.npmjs.org/%40govp%2Fverifier/latest", as_json=True)["version"] == js
+
+          profile = get("https://raw.githubusercontent.com/govp-protocol/.github/main/profile/README.md")
+          assert f"reference verifier {py}" in profile
+          assert f"@govp/verifier` {js}" in profile
+
+          home = get("https://govp.io/")
+          assert f"verifier {py}" in home
+          assert f"npm install @govp/verifier@{js}" in home
+          PY
+
+          curl --fail --silent --show-error --location \
+            "https://github.com/govp-protocol/govp/releases/tag/v${GOVP_PYTHON_VERSION}" >/dev/null
+          curl --fail --silent --show-error --location \
+            "https://github.com/govp-protocol/govp-js/releases/tag/v${GOVP_JAVASCRIPT_VERSION}" >/dev/null
+
       - name: Resolve the current release record from discovery
         id: release
         run: |
