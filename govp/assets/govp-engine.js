@@ -1,10 +1,13 @@
 /*
- * GOVP-1 browser reference verifier.
+ * GOVP-1 JavaScript verifier.
  *
- * This module is byte-compatible with govp-protocol/govp 0.1.10. Records are
+ * This module is byte-compatible with govp-protocol/govp 0.1.11. Records are
  * processed locally and no field is uploaded by this code.
  */
-import { verifyAsync as nobleVerify } from './noble-ed25519.js?v=0.1.10-20260805.1';
+import { Point, hashes, verify as nobleVerify } from './noble-ed25519.js?v=0.1.11-20260806.1';
+import { sha256, sha512 } from './noble-hashes/sha2.js?v=0.1.11-20260806.1';
+
+hashes.sha512 = sha512;
 
 const encoder = new TextEncoder();
 const RECORD_DOMAIN = 'GOVP::record.v1\0';
@@ -111,6 +114,23 @@ function normalizeFields(fields) {
   return normalized;
 }
 
+function normalizeJsonFields(fields) {
+  const normalized = {};
+  const sources = new Map();
+  for (const [rawKey, rawValue] of Object.entries(fields)) {
+    const normalizedKey = normalizeFieldName(rawKey);
+    const canonicalKey = LEGACY[normalizedKey] || normalizedKey;
+    if (sources.has(canonicalKey)) {
+      throw new TypeError(
+        `JSON record contains colliding normalized field names: ${JSON.stringify(sources.get(canonicalKey))} and ${JSON.stringify(rawKey)}`,
+      );
+    }
+    sources.set(canonicalKey, rawKey);
+    normalized[canonicalKey] = trimFieldValue(rawValue);
+  }
+  return normalized;
+}
+
 function validUriCharacters(value) {
   for (let index = 0; index < value.length;) {
     const character = value[index];
@@ -196,6 +216,17 @@ function validRfc3339Utc(value) {
   return second >= 0 && second <= 59;
 }
 
+function rfc3339UtcMilliseconds(value) {
+  if (!validRfc3339Utc(value)) return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?Z$/.exec(value);
+  const [year, month, day, hour, minute, second] = match.slice(1, 7).map(Number);
+  const milliseconds = Number((match[7] || '').padEnd(3, '0').slice(0, 3));
+  const date = new Date(0);
+  date.setUTCFullYear(year, month - 1, day);
+  date.setUTCHours(hour, minute, Math.min(second, 59), milliseconds);
+  return date.getTime() + (second === 60 ? 1000 : 0);
+}
+
 function validFormat(fields) {
   try {
     validateSignableFields(fields);
@@ -226,7 +257,7 @@ function hexadecimal(buffer) {
 }
 
 async function sha256Hex(bytes) {
-  return hexadecimal(await crypto.subtle.digest('SHA-256', bytes));
+  return hexadecimal(sha256(bytes));
 }
 
 function concatenate(first, second) {
@@ -278,7 +309,7 @@ export function loadJsonRecord(payload) {
     throw new TypeError('JSON record field names and values must be strings');
   }
   validateSignableFields(record);
-  const fields = normalizeFields(record);
+  const fields = normalizeJsonFields(record);
   validateSignableFields(fields);
   if (bundle !== null && !bundleMatches(bundle, fields)) {
     throw new TypeError('JSON bundle asset must match the signed record');
@@ -306,17 +337,21 @@ export async function deriveGovpId(assetType, assetId, assetSha256) {
   return `GOVP-${TYPECODE[normalizedType]}-${digest.slice(0, 12)}`;
 }
 
-let nativeEd25519 = null;
-
-async function supportsNativeEd25519() {
-  if (nativeEd25519 !== null) return nativeEd25519;
-  try {
-    await crypto.subtle.importKey('raw', new Uint8Array(32), { name: 'Ed25519' }, false, ['verify']);
-    nativeEd25519 = true;
-  } catch {
-    nativeEd25519 = false;
+function littleEndianInteger(bytes) {
+  let result = 0n;
+  for (let index = bytes.length - 1; index >= 0; index -= 1) {
+    result = (result << 8n) | BigInt(bytes[index]);
   }
-  return nativeEd25519;
+  return result;
+}
+
+function strictPrimeSubgroupPoint(bytes) {
+  try {
+    const point = Point.fromBytes(bytes, false);
+    return !point.isSmallOrder() && point.isTorsionFree();
+  } catch {
+    return false;
+  }
 }
 
 export async function verifyRecordSignature(fields) {
@@ -329,30 +364,17 @@ export async function verifyRecordSignature(fields) {
   } catch {
     return false;
   }
-  if (await supportsNativeEd25519()) {
-    try {
-      const publicKey = await crypto.subtle.importKey(
-        'raw',
-        decodeBase64(normalized['public-key']),
-        { name: 'Ed25519' },
-        false,
-        ['verify'],
-      );
-      return await crypto.subtle.verify(
-        { name: 'Ed25519' },
-        publicKey,
-        decodeBase64(normalized.signature),
-        message,
-      );
-    } catch {
-      // Fall through to the vendored, audited implementation.
-    }
-  }
   try {
+    const publicKey = decodeBase64(normalized['public-key']);
+    const signature = decodeBase64(normalized.signature);
+    if (!strictPrimeSubgroupPoint(publicKey)
+        || !strictPrimeSubgroupPoint(signature.subarray(0, 32))
+        || littleEndianInteger(signature.subarray(32)) >= Point.CURVE().n) return false;
     return await nobleVerify(
-      decodeBase64(normalized.signature),
+      signature,
       message,
-      decodeBase64(normalized['public-key']),
+      publicKey,
+      { zip215: false },
     );
   } catch {
     return false;
@@ -437,7 +459,8 @@ export async function verifyFields(fields, { fetchedUrl = null, assetBytes = nul
     assetSha256,
     warnings: presentationWarnings(fields),
     bundle: bundleOk,
-    native: nativeEd25519,
+    native: false,
+    backend: '@noble/ed25519@3.1.0-strict',
   };
 }
 
@@ -445,14 +468,182 @@ export async function verifyText(text, options = {}) {
   return verifyFields(parseRecord(text), options);
 }
 
+
+const KEY_STATES = new Set(['active', 'retired', 'revoked']);
+const REVOCATION_REASONS = new Set([
+  'cessation', 'compromised', 'other', 'superseded', 'withdrawn',
+]);
+const STATUS_FIELDS = new Set([
+  'authority', 'canonical', 'format', 'generated_at', 'keys', 'publisher',
+  'revoked_records',
+]);
+const KEY_FIELDS = new Set(['changed_at', 'key_id', 'public_key', 'state']);
+const REVOCATION_FIELDS = new Set(['govp_id', 'reason', 'revoked_at']);
+
+function hasExactFields(value, expected) {
+  const keys = Object.keys(value);
+  return keys.length === expected.size && keys.every((key) => expected.has(key));
+}
+
+export async function deriveKeyId(publicKey) {
+  if (!validBase64Length(publicKey, 32)) {
+    throw new TypeError('public key must contain 32 raw Ed25519 bytes');
+  }
+  return `sha256:${await sha256Hex(decodeBase64(publicKey))}`;
+}
+
+export function parseStatus(text) {
+  const payload = JSON.parse(text);
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    throw new TypeError('status document must be a JSON object');
+  }
+  return payload;
+}
+
+function httpsOrigin(value) {
+  if (!validAbsoluteUrl(value, true)) return null;
+  try {
+    const parsed = new URL(value);
+    return `${parsed.protocol.toLowerCase()}//${parsed.hostname.toLowerCase()}:${parsed.port || '443'}`;
+  } catch {
+    return null;
+  }
+}
+
+async function validStatusFormat(status) {
+  if (!status || typeof status !== 'object' || Array.isArray(status)
+      || !hasExactFields(status, STATUS_FIELDS)
+      || status.format !== 'GOVP-STATUS-1'
+      || status.authority !== 'https-origin'
+      || typeof status.publisher !== 'string' || !status.publisher
+      || typeof status.canonical !== 'string' || !validAbsoluteUrl(status.canonical, true)
+      || typeof status.generated_at !== 'string' || !validRfc3339Utc(status.generated_at)
+      || !Array.isArray(status.keys) || status.keys.length === 0
+      || !Array.isArray(status.revoked_records)) return false;
+
+  const keyIds = new Set();
+  const publicKeys = new Set();
+  for (const entry of status.keys) {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)
+        || !hasExactFields(entry, KEY_FIELDS)
+        || typeof entry.key_id !== 'string'
+        || typeof entry.public_key !== 'string'
+        || !KEY_STATES.has(entry.state)
+        || typeof entry.changed_at !== 'string'
+        || !validRfc3339Utc(entry.changed_at)) return false;
+    let expected;
+    try {
+      expected = await deriveKeyId(entry.public_key);
+    } catch {
+      return false;
+    }
+    if (entry.key_id !== expected
+        || keyIds.has(entry.key_id)
+        || publicKeys.has(entry.public_key)) return false;
+    keyIds.add(entry.key_id);
+    publicKeys.add(entry.public_key);
+  }
+
+  const revokedIds = new Set();
+  for (const entry of status.revoked_records) {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)
+        || !hasExactFields(entry, REVOCATION_FIELDS)
+        || typeof entry.govp_id !== 'string'
+        || !/^GOVP-(DOC|DATA|MODEL|AGENT|PIPE|BENCH)-[0-9a-f]{12}$/.test(entry.govp_id)
+        || revokedIds.has(entry.govp_id)
+        || typeof entry.revoked_at !== 'string'
+        || !validRfc3339Utc(entry.revoked_at)
+        || !REVOCATION_REASONS.has(entry.reason)) return false;
+    revokedIds.add(entry.govp_id);
+  }
+  return true;
+}
+
+export async function evaluateStatus(
+  fields,
+  status,
+  {
+    fetchedUrl = null,
+    recordFetchedUrl = null,
+    now = Date.now(),
+    maxAgeSeconds = 300,
+    maxFutureSkewSeconds = 60,
+  } = {},
+) {
+  if (!Number.isFinite(maxAgeSeconds) || maxAgeSeconds < 0
+      || !Number.isFinite(maxFutureSkewSeconds) || maxFutureSkewSeconds < 0) {
+    throw new TypeError('status freshness windows must be finite and non-negative');
+  }
+  const evaluationTime = now instanceof Date ? now.getTime() : Number(now);
+  if (!Number.isFinite(evaluationTime)) {
+    throw new TypeError('status evaluation time must be a Date or millisecond timestamp');
+  }
+  const core = await verifyFields(fields, { fetchedUrl: recordFetchedUrl });
+  const normalized = core.fields;
+  const statusFormat = await validStatusFormat(status);
+  const generatedAt = statusFormat ? rfc3339UtcMilliseconds(status.generated_at) : null;
+  const statusFresh = generatedAt !== null
+    && generatedAt >= evaluationTime - maxAgeSeconds * 1000
+    && generatedAt <= evaluationTime + maxFutureSkewSeconds * 1000;
+  const statusCanonical = fetchedUrl === null
+    ? null
+    : Boolean(
+      statusFormat
+      && normalizeCanonical(status.canonical) === normalizeCanonical(fetchedUrl),
+    );
+  const sameOrigin = Boolean(
+    statusFormat && httpsOrigin(normalized.canonical) === httpsOrigin(status.canonical),
+  );
+  const keyActive = Boolean(
+    statusFormat && status.keys.some((entry) => (
+      entry.public_key === normalized['public-key'] && entry.state === 'active'
+    )),
+  );
+  const recordNotRevoked = Boolean(
+    statusFormat && Boolean(normalized['govp-id']) && !status.revoked_records.some((entry) => (
+      entry.govp_id === normalized['govp-id']
+    )),
+  );
+  const checks = {
+    core: core.ok,
+    'status-format': statusFormat,
+    'status-fresh': statusFresh,
+    'status-canonical': statusCanonical,
+    'same-origin': sameOrigin,
+    'key-active': keyActive,
+    'record-not-revoked': recordNotRevoked,
+  };
+  const snapshotValid = core.ok
+    && statusFormat
+    && sameOrigin
+    && keyActive
+    && recordNotRevoked;
+  const online = fetchedUrl !== null && recordFetchedUrl !== null;
+  const currentlyTrusted = online
+    ? snapshotValid && statusFresh && statusCanonical === true
+    : null;
+  return {
+    currentlyTrusted,
+    snapshotValid,
+    snapshotTrusted: snapshotValid,
+    checks,
+    reasons: Object.entries(checks)
+      .filter(([, value]) => value === false)
+      .map(([name]) => name),
+  };
+}
+
 export const GOVP = {
   RECORD_DOMAIN,
   TYPECODE,
   deriveGovpId,
+  deriveKeyId,
+  evaluateStatus,
   loadJsonRecord,
   normalizeCanonical,
   normalizeFieldName,
   parseRecord,
+  parseStatus,
   signingInput,
   trimFieldValue,
   verifyFields,

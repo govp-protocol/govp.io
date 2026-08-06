@@ -1,14 +1,14 @@
 {
   "format": "govp-protocol-source-v1",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "repository": "https://github.com/govp-protocol/govp",
-  "commit": "84a096836c409a0aa45e7511d80f6e4c871091ca",
-  "tree": "2b94b674ddb1fa52dc1653c55fb0bbbf8b56dbf0",
-  "source_zip_sha256": "25b1c21a734ff5f6ef56bbeafa0f570c5159ca512fc4b92c06cf34d2c4b6d6fe",
+  "commit": "3c099c8e75e36fd28778c4da0ec8d0e4387690f3",
+  "tree": "4dcbb9a09d4c0c7b33a8c6f6ce556950f5aaf53c",
+  "source_zip_sha256": "89d45080fbdff7cca7efbaf1027d205ed14295c1d33e6a35be4722bb88c0296a",
   "artifacts": {
-    "govp/spec/govp-1.txt": "f387da9eac3753c850d268a48a210d2c0bd5dd7e5af3989f094fec348a20cd01",
+    "govp/spec/govp-1.txt": "d002832f1b17723d97d331acd0444f9dfb574e10be426b8725de8eb45d74c0e1",
     "govp/conformance/vectors.json": "97ca58bc321018b0a254c6689a7226938e60201f1e7b350b0a6b614bdc7fba27",
-    "govp/conformance/json-vectors.json": "9506e9454bed3caa4232dc8c8d1bd2b1d5ade03403dae90ffbb82106da3faecc",
+    "govp/conformance/json-vectors.json": "aa0783a7fb9ab011e04acd9b2e94d66862a28067996a3f9cb0cf3d20dcf9bc67",
     "govp/schemas/govp-1.schema.json": "dff982fe2c5617f62c0007c4679307fa7af998c599179a0244d75885137a5451",
     "govp/schemas/govp-status-1.schema.json": "8a3f01fab4a5f5585e61ceaa1060272cb3206e3da72a1d7bc06529fcd25656ed",
     "govp/conformance/status-vectors.json": "04cebae80ca35d983aef67e414aa31f35b61ed00025c89d977c0d02342080d8d"

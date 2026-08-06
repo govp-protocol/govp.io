@@ -113,6 +113,18 @@
         "load_ok": false,
         "error": "must match"
       }
+    },
+    {
+      "name": "07-reject-normalized-name-collision",
+      "payload": {
+        "version": "GOVP-1",
+        "Govp-ID": "GOVP-DOC-000000000000",
+        "govp-id": "GOVP-DOC-111111111111"
+      },
+      "expected": {
+        "load_ok": false,
+        "error": "colliding normalized field names"
+      }
     }
   ]
 }

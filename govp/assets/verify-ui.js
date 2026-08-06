@@ -1,4 +1,4 @@
-import { verifySource } from './verify-source.js?v=0.1.10-20260805.1';
+import { verifySource } from './verify-source.js?v=0.1.11-20260806.1';
 
 const MAX_RECORD_BYTES = 1024 * 1024;
 const MAX_ASSET_BYTES = 16 * 1024 * 1024;
