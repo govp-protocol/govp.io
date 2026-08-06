@@ -7,9 +7,10 @@ const version = '0.1.10';
 const sourceCommit = '84a096836c409a0aa45e7511d80f6e4c871091ca';
 const releaseUrl = 'https://github.com/govp-protocol/govp/releases/tag/v0.1.10';
 const pypiUrl = 'https://pypi.org/project/govp/0.1.10/';
-const jsVersion = '0.1.2';
+const jsVersion = '0.1.7';
 const npmUrl = `https://www.npmjs.com/package/@govp/verifier/v/${jsVersion}`;
 const jsSourceUrl = 'https://github.com/govp-protocol/govp-js';
+const jsReleaseUrl = `https://github.com/govp-protocol/govp-js/releases/tag/v${jsVersion}`;
 const assetRevision = '0.1.10-20260805.1';
 const asset = (path) => `${path}?v=${assetRevision}`;
 const socialPreviewUrl = 'https://govp.io/govp/assets/govp-social-preview.png';
@@ -186,7 +187,7 @@ pages.set('govp/download.html', page({
   active: 'install', title: 'Get GOVP', description: 'Install the stable Python reference implementation, JavaScript verifier or checksummed standalone executable.',
   body: `<h2>Python from PyPI</h2><pre><code>python -m pip install govp==${version}
 govp self-test
-govp conformance --run</code></pre><p><a class="btn btn--primary" href="${pypiUrl}">GOVP ${version} on PyPI</a></p><p>A convenient <a href="/install.sh">installation helper</a> installs the same pinned package after showing the command.</p><h2>JavaScript from npm</h2><pre><code>npm install @govp/verifier@${jsVersion}</code></pre><p><a class="btn btn--primary" href="${npmUrl}">@govp/verifier ${jsVersion} on npm</a> <a class="btn btn--ghost" href="${jsSourceUrl}">JavaScript source</a></p><p>The package works in Node.js 20+ and modern browsers, performs local verification and leaves network retrieval to the application.</p><h2>Standalone executables</h2><p>The <a href="${releaseUrl}">GitHub release</a> provides checksummed binaries for Linux x86-64 and ARM64, macOS Intel and Apple silicon, and Windows x86-64. Verify every download against <code>SHA256SUMS</code>.</p><h2>Source and provenance</h2><p><a href="https://github.com/govp-protocol/govp">Canonical protocol and Python repository</a> · <a href="${jsSourceUrl}">JavaScript repository</a> · <a href="${releaseUrl}">Signed Python release assets</a> · <a href="/PROTOCOL-SOURCE.json">Website provenance manifest</a></p><p>Protocol release ${version}, its Python distributions, standalone binaries, license notices and checksums were published together from commit <code>${sourceCommit}</code>. JavaScript package ${jsVersion} is versioned independently and tested against the same public conformance vectors.</p>`,
+govp conformance --run</code></pre><p><a class="btn btn--primary" href="${pypiUrl}">GOVP ${version} on PyPI</a></p><p>A convenient <a href="/install.sh">installation helper</a> installs the same pinned package after showing the command.</p><h2>JavaScript from npm</h2><pre><code>npm install @govp/verifier@${jsVersion}</code></pre><p><a class="btn btn--primary" href="${npmUrl}">@govp/verifier ${jsVersion} on npm</a> <a class="btn btn--ghost" href="${jsSourceUrl}">JavaScript source</a> <a class="btn btn--ghost" href="${jsReleaseUrl}">Signed release</a></p><p>The package works in Node.js 20+ and modern browsers, performs local verification and leaves network retrieval to the application.</p><h2>Standalone executables</h2><p>The <a href="${releaseUrl}">GitHub release</a> provides checksummed binaries for Linux x86-64 and ARM64, macOS Intel and Apple silicon, and Windows x86-64. Verify every download against <code>SHA256SUMS</code>.</p><h2>Source and provenance</h2><p><a href="https://github.com/govp-protocol/govp">Canonical protocol and Python repository</a> · <a href="${jsSourceUrl}">JavaScript repository</a> · <a href="${releaseUrl}">Signed Python release assets</a> · <a href="${jsReleaseUrl}">Signed JavaScript release assets</a> · <a href="/PROTOCOL-SOURCE.json">Website provenance manifest</a></p><p>Protocol release ${version}, its Python distributions, standalone binaries, license notices and checksums were published together from commit <code>${sourceCommit}</code>. JavaScript package ${jsVersion} is versioned independently and tested against the same public conformance vectors.</p>`,
 }));
 
 pages.set('govp/faq.html', page({

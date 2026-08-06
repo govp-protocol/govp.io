@@ -6,8 +6,8 @@ Version: 0.1.10
 Protocol: GOVP-1 (stable)
 Install (Python): python -m pip install govp==0.1.10
 PyPI: https://pypi.org/project/govp/0.1.10/
-Install (JavaScript): npm install @govp/verifier@0.1.2
-npm: https://www.npmjs.com/package/@govp/verifier/v/0.1.2
+Install (JavaScript): npm install @govp/verifier@0.1.7
+npm: https://www.npmjs.com/package/@govp/verifier/v/0.1.7
 Python release: https://github.com/govp-protocol/govp/releases/tag/v0.1.10
 Canonical protocol source: https://github.com/govp-protocol/govp
 JavaScript source: https://github.com/govp-protocol/govp-js
