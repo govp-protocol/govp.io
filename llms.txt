@@ -4,16 +4,21 @@
 
 Version: 0.1.10
 Protocol: GOVP-1 (stable)
-Install: python -m pip install govp==0.1.10
+Install (Python): python -m pip install govp==0.1.10
 PyPI: https://pypi.org/project/govp/0.1.10/
-Release: https://github.com/govp-protocol/govp/releases/tag/v0.1.10
-Canonical source: https://github.com/govp-protocol/govp
+Install (JavaScript): npm install @govp/verifier@0.1.2
+npm: https://www.npmjs.com/package/@govp/verifier/v/0.1.2
+Python release: https://github.com/govp-protocol/govp/releases/tag/v0.1.10
+Canonical protocol source: https://github.com/govp-protocol/govp
+JavaScript source: https://github.com/govp-protocol/govp-js
 Release source commit: 84a096836c409a0aa45e7511d80f6e4c871091ca
 License: Apache-2.0
 
 Primary documentation:
 - https://govp.io/govp/spec/govp-1.txt
 - https://govp.io/govp/docs.html
+- https://govp.io/govp/quickstart.html
+- https://govp.io/govp/integration.html
 - https://govp.io/govp/composition.html
 - https://govp.io/govp/conformance/vectors.json
 - https://govp.io/govp/conformance/json-vectors.json

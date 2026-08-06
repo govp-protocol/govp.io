@@ -13,7 +13,10 @@ from govp import load_record, verify
 record = load_record("record.govp.txt")
 result = verify(record, asset_bytes=Path("artifact.bin").read_bytes())
 if not result.ok:
-    raise ValueError(result.checks)</code></pre><p>The supported top-level API also exports <code>parse_record</code>, <code>derive_govp_id</code>, <code>signing_input</code>, <code>sign_record</code>, <code>serialize_record</code>, <code>evaluate_status</code>, <code>VerifyResult</code> and <code>StatusResult</code>. SemVer applies to these documented exports.</p><h2>Issue without reconstructing the signature format</h2><pre><code>govp issue --asset artifact.bin \
+    raise ValueError(result.checks)</code></pre><p>The supported top-level API also exports <code>parse_record</code>, <code>derive_govp_id</code>, <code>signing_input</code>, <code>sign_record</code>, <code>serialize_record</code>, <code>evaluate_status</code>, <code>VerifyResult</code> and <code>StatusResult</code>. SemVer applies to these documented exports.</p><h2>JavaScript API</h2><pre><code>import { verifyText } from '@govp/verifier';
+
+const result = await verifyText(recordText, { assetBytes, fetchedUrl });
+if (!result.ok) throw new Error(JSON.stringify(result.checks));</code></pre><p>The JavaScript package works in Node.js 20+ and modern browsers. It independently implements GOVP-1 and GOVP-STATUS-1 against the published vectors and deliberately leaves network retrieval to the caller.</p><h2>Issue without reconstructing the signature format</h2><pre><code>govp issue --asset artifact.bin \
   --canonical 'https://issuer.example/.well-known/govp/{govp-id}.govp' \
   --publisher "Example issuer" --asset-type document \
   --asset-id example/release --evidence https://issuer.example/release \
