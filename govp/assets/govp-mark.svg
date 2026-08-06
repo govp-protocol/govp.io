@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">GOVP mark</title>
+  <desc id="desc">An open letter G formed by a continuous protocol path between two verification nodes.</desc>
+  <path d="M72 23C65.5 16.6 56.7 13 47 13C28.2 13 13 28.2 13 47S28.2 81 47 81C63.3 81 77 69.5 80.2 54H52V43H76" fill="none" stroke="#3E7BFA" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="72" cy="23" r="4.5" fill="#22C7E5"/>
+  <circle cx="76" cy="43" r="4.5" fill="#22C7E5"/>
+</svg>

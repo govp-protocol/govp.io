@@ -1,0 +1,7 @@
+SYNTHETIC MANUFACTURING DECLARATION
+This fixture is fictional and contains no production or customer data.
+Production lot: SAMPLE-LOT-0001
+Machine configuration: SAMPLE-CONFIG-A
+Inspection checklist: SAMPLE-QC-01 (passed)
+Operator reference: SAMPLE-OPERATOR
+Declared grade: EXAMPLE-GRADE

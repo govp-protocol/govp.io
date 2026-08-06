@@ -1,0 +1,163 @@
+{
+  "spec": "GOVP-CORE-CONFORMANCE-1",
+  "domain": "GOVP::record.v1\\0",
+  "public_key_32_b64": "A6EHv/POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg=",
+  "vectors": [
+    {
+      "name": "01-valid-document",
+      "description": "Documento GOVP-1 completo y firmado",
+      "record": "Version: GOVP-1\nCanonical: https://winery.example/.well-known/govp.txt\nPublisher: winery.example\nAsset-Type: document\nAsset-ID: aviso-legal\nAsset-SHA256: 71e5bb01f249ad18a551a218b0b5b9eb40263c64ae1c8f37dc48951622a54734\nLicense: CC-BY-4.0\nProfile: GOVP-BASIC\nGenerated-At: 2026-05-31T10:00:00Z\nGOVP-ID: GOVP-DOC-39969a54190e\nEvidence: https://winery.example/ev/1\nPublic-Key: A6EHv/POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg=\nSignature: uq+dPdfTRlEPPVOosgWAjpjAU+FO0E5SDl5Wo5m9RVK8Ysk/mAN907neMZMD7ISly/VF5Rxcq0JyKwHmjg9YAg==\n",
+      "expected": {
+        "format_ok": true,
+        "govpid_ok": true,
+        "signature_ok": true,
+        "core_valid": true,
+        "govp_id": "GOVP-DOC-39969a54190e",
+        "signing_input_sha256": "d3263b7c87442418f76768caa4048fbad6fa108583837966a2ff04d7e1df26ff"
+      }
+    },
+    {
+      "name": "02-valid-dataset-whitespace",
+      "description": "Dataset v\u00e1lido; l\u00edneas con espacios/tabs finales \u2192 trim can\u00f3nico ASCII",
+      "record": "Version: GOVP-1\nCanonical: https://lab.example/.well-known/govp.txt\nPublisher: lab.example   \t\nAsset-Type: dataset\nAsset-ID: rioja-2024/crianza-meses\nAsset-SHA256: a3f1c9d2e4b5a6978889aabbccddeeff00112233445566778899aabbccddeeff  \nProfile: GOVP-RFC3161\nGenerated-At: 2026-05-30T08:30:00Z\nGOVP-ID: GOVP-DATA-16f314418720\nEvidence: https://lab.example/ev/x\nPublic-Key: A6EHv/POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg=\nSignature: dGg8Mi01TsaRDZ4aF2bfVNvhN+gFoXzj+LdayG/ixSUyvMzJxC82qPIF1oc7FHRDj/YU3RUTFNvsa+DaiAnZBA==\n",
+      "expected": {
+        "format_ok": true,
+        "govpid_ok": true,
+        "signature_ok": true,
+        "core_valid": true,
+        "govp_id": "GOVP-DATA-16f314418720",
+        "signing_input_sha256": "0fcb0d90123906b2498ada9cb995e83bba184d87b1a65490de9d8de113f38684"
+      }
+    },
+    {
+      "name": "03-legacy-aliases-crlf",
+      "description": "Alias heredados (type/sha256/pubkey), CRLF y comentarios \u2192 equivalentes",
+      "record": "# record con alias heredados y CRLF\r\nVersion: GOVP-1\r\nCanonical: https://winery.example/.well-known/govp.txt\r\nPublisher: winery.example\r\nType: document\r\nAsset-ID: aviso-legal\r\nSHA256: 71e5bb01f249ad18a551a218b0b5b9eb40263c64ae1c8f37dc48951622a54734\r\nLicense: CC-BY-4.0\r\nProfile: GOVP-BASIC\r\nGenerated-At: 2026-05-31T10:00:00Z\r\nGOVP-ID: GOVP-DOC-39969a54190e\r\nEvidence: https://winery.example/ev/1\r\nPubkey: A6EHv/POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg=\r\nSignature: uq+dPdfTRlEPPVOosgWAjpjAU+FO0E5SDl5Wo5m9RVK8Ysk/mAN907neMZMD7ISly/VF5Rxcq0JyKwHmjg9YAg==\r\n",
+      "expected": {
+        "format_ok": true,
+        "govpid_ok": true,
+        "signature_ok": true,
+        "core_valid": true,
+        "govp_id": "GOVP-DOC-39969a54190e",
+        "signing_input_sha256": "d3263b7c87442418f76768caa4048fbad6fa108583837966a2ff04d7e1df26ff"
+      }
+    },
+    {
+      "name": "04-wrong-govp-id",
+      "description": "GOVP-ID no corresponde al contenido",
+      "record": "Version: GOVP-1\nCanonical: https://winery.example/.well-known/govp.txt\nPublisher: winery.example\nAsset-Type: document\nAsset-ID: aviso-legal\nAsset-SHA256: 71e5bb01f249ad18a551a218b0b5b9eb40263c64ae1c8f37dc48951622a54734\nLicense: CC-BY-4.0\nProfile: GOVP-BASIC\nGenerated-At: 2026-05-31T10:00:00Z\nGOVP-ID: GOVP-DOC-000000000000\nEvidence: https://winery.example/ev/1\nPublic-Key: A6EHv/POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg=\nSignature: uq+dPdfTRlEPPVOosgWAjpjAU+FO0E5SDl5Wo5m9RVK8Ysk/mAN907neMZMD7ISly/VF5Rxcq0JyKwHmjg9YAg==\n",
+      "expected": {
+        "format_ok": true,
+        "govpid_ok": false,
+        "signature_ok": false,
+        "core_valid": false,
+        "govp_id": "GOVP-DOC-000000000000",
+        "signing_input_sha256": "732d019b3fc7125f5fac48ea19937f31fcc911dbc49eb9921aa230dc8df04a27"
+      }
+    },
+    {
+      "name": "05-bad-signature",
+      "description": "Firma Ed25519 inv\u00e1lida",
+      "record": "Version: GOVP-1\nCanonical: https://winery.example/.well-known/govp.txt\nPublisher: winery.example\nAsset-Type: document\nAsset-ID: aviso-legal\nAsset-SHA256: 71e5bb01f249ad18a551a218b0b5b9eb40263c64ae1c8f37dc48951622a54734\nLicense: CC-BY-4.0\nProfile: GOVP-BASIC\nGenerated-At: 2026-05-31T10:00:00Z\nGOVP-ID: GOVP-DOC-39969a54190e\nEvidence: https://winery.example/ev/1\nPublic-Key: A6EHv/POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg=\nSignature: u6+dPdfTRlEPPVOosgWAjpjAU+FO0E5SDl5Wo5m9RVK8Ysk/mAN907neMZMD7ISly/VF5Rxcq0JyKwHmjg9YAg==\n",
+      "expected": {
+        "format_ok": true,
+        "govpid_ok": true,
+        "signature_ok": false,
+        "core_valid": false,
+        "govp_id": "GOVP-DOC-39969a54190e",
+        "signing_input_sha256": "d3263b7c87442418f76768caa4048fbad6fa108583837966a2ff04d7e1df26ff"
+      }
+    },
+    {
+      "name": "06-missing-required",
+      "description": "Falta campo obligatorio (evidence) \u2192 formato inv\u00e1lido",
+      "record": "Version: GOVP-1\nCanonical: https://winery.example/.well-known/govp.txt\nPublisher: winery.example\nAsset-Type: document\nAsset-ID: aviso-legal\nAsset-SHA256: 71e5bb01f249ad18a551a218b0b5b9eb40263c64ae1c8f37dc48951622a54734\nLicense: CC-BY-4.0\nProfile: GOVP-BASIC\nGenerated-At: 2026-05-31T10:00:00Z\nGOVP-ID: GOVP-DOC-39969a54190e\nPublic-Key: A6EHv/POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg=\nSignature: uq+dPdfTRlEPPVOosgWAjpjAU+FO0E5SDl5Wo5m9RVK8Ysk/mAN907neMZMD7ISly/VF5Rxcq0JyKwHmjg9YAg==\n",
+      "expected": {
+        "format_ok": false,
+        "govpid_ok": true,
+        "signature_ok": false,
+        "core_valid": false,
+        "govp_id": "GOVP-DOC-39969a54190e",
+        "signing_input_sha256": "fc54e4b9fcfaec579bc08c3c4ca38f4994d649b81aba06536eb178ae32ba5099"
+      }
+    },
+    {
+      "name": "07-not-govp1",
+      "description": "version != GOVP-1 \u2192 no es un record GOVP-1",
+      "record": "Version: GOVP-0\nCanonical: https://winery.example/.well-known/govp.txt\nPublisher: winery.example\nAsset-Type: document\nAsset-ID: aviso-legal\nAsset-SHA256: 71e5bb01f249ad18a551a218b0b5b9eb40263c64ae1c8f37dc48951622a54734\nLicense: CC-BY-4.0\nProfile: GOVP-BASIC\nGenerated-At: 2026-05-31T10:00:00Z\nGOVP-ID: GOVP-DOC-39969a54190e\nEvidence: https://winery.example/ev/1\nPublic-Key: A6EHv/POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg=\nSignature: uq+dPdfTRlEPPVOosgWAjpjAU+FO0E5SDl5Wo5m9RVK8Ysk/mAN907neMZMD7ISly/VF5Rxcq0JyKwHmjg9YAg==\n",
+      "expected": {
+        "format_ok": false,
+        "govpid_ok": true,
+        "signature_ok": null,
+        "core_valid": false,
+        "govp_id": "GOVP-DOC-39969a54190e",
+        "signing_input_sha256": "c7b088bedcc1000aa1b54717dab10e17f82614caccc55331b201171faa759822"
+      }
+    },
+    {
+      "name": "08-empty-value-dropped",
+      "description": "Campo vac\u00edo (license) se descarta del signing input; firma sigue v\u00e1lida",
+      "record": "Version: GOVP-1\nCanonical: https://winery.example/.well-known/govp.txt\nPublisher: winery.example\nAsset-Type: document\nAsset-ID: aviso-legal\nAsset-SHA256: 71e5bb01f249ad18a551a218b0b5b9eb40263c64ae1c8f37dc48951622a54734\nLicense: \nProfile: GOVP-BASIC\nGenerated-At: 2026-05-31T10:00:00Z\nGOVP-ID: GOVP-DOC-39969a54190e\nEvidence: https://winery.example/ev/1\nPublic-Key: A6EHv/POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg=\nSignature: 4cM2YBRc8SnQkhPQMQrYveijCn3b3n1koCZwB9Pz8Ic7AC3NQucD+lYX4c80OV/6R61QTaXQFEDXgxRT64aXDA==\n",
+      "expected": {
+        "format_ok": true,
+        "govpid_ok": true,
+        "signature_ok": true,
+        "core_valid": true,
+        "govp_id": "GOVP-DOC-39969a54190e",
+        "signing_input_sha256": "6e098f63caebaff6d0cc0b92047acd1140a6183c4e0bf7703c8fdfc527ae6f13"
+      }
+    },
+    {
+      "name": "09-missing-public-key",
+      "description": "Falta public-key obligatorio: formato y firma inv\u00e1lidos",
+      "record": "Version: GOVP-1\nCanonical: https://winery.example/.well-known/govp.txt\nPublisher: winery.example\nAsset-Type: document\nAsset-ID: aviso-legal\nAsset-SHA256: 71e5bb01f249ad18a551a218b0b5b9eb40263c64ae1c8f37dc48951622a54734\nLicense: CC-BY-4.0\nProfile: GOVP-BASIC\nGenerated-At: 2026-05-31T10:00:00Z\nGOVP-ID: GOVP-DOC-39969a54190e\nEvidence: https://winery.example/ev/1\nSignature: uq+dPdfTRlEPPVOosgWAjpjAU+FO0E5SDl5Wo5m9RVK8Ysk/mAN907neMZMD7ISly/VF5Rxcq0JyKwHmjg9YAg==\n",
+      "expected": {
+        "format_ok": false,
+        "govpid_ok": true,
+        "signature_ok": false,
+        "core_valid": false,
+        "govp_id": "GOVP-DOC-39969a54190e",
+        "signing_input_sha256": "584e700c10b4f085ff97824e1ff34408acca7fb3a3c80514c5e63d1d395a516c"
+      }
+    },
+    {
+      "name": "10-valid-non-ascii-extension",
+      "description": "ASCII-only key normalization preserves non-ASCII extension code points",
+      "record": "Version: GOVP-1\nCanonical: https://unicode.example/.well-known/govp.txt\nPublisher: unicode.example\nAsset-Type: document\nAsset-ID: unicode-extension\nAsset-SHA256: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\nGOVP-ID: GOVP-DOC-2cc0f5c6ac14\nEvidence: https://unicode.example/evidence/1\nPublic-Key: A6EHv/POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg=\nX-\u00c9vidence: pr\u00e9serv\u00e9e\nSignature: J05opi+EQPAozsx1ZCZQ3RlH7vvIIgezBf/tO2bU2aVqS+kXpzHuhH3Fu3vNdIhBJ/d8L8d8zuK3okN0tQGfCA==\n",
+      "expected": {
+        "format_ok": true,
+        "govpid_ok": true,
+        "signature_ok": true,
+        "core_valid": true,
+        "govp_id": "GOVP-DOC-2cc0f5c6ac14",
+        "signing_input_sha256": "9c9f67103727fa0f4404fcd5059c35527fbd2b81f90a874c97651ac76eff7cad"
+      }
+    },
+    {
+      "name": "11-valid-frozen-whitespace-trim",
+      "description": "The frozen GOVP-1 trim set removes trailing NBSP before signing",
+      "record": "Version: GOVP-1\nCanonical: https://unicode-whitespace.example/.well-known/govp.txt\nPublisher: example organization\u00a0\nAsset-Type: document\nAsset-ID: unicode-whitespace\nAsset-SHA256: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\nEvidence: https://unicode-whitespace.example/evidence/1\nGenerated-At: 2026-08-04T12:00:00Z\nGOVP-ID: GOVP-DOC-86921fe3d779\nPublic-Key: a51jhMna6fB5XztJjmaSTa7OFEWPwYbbR35etBkF7yI=\nSignature: QHmfDMbttQPshnqqEAzn9H+D6OWbIT/kaog2ZjAPE65Ee5gtB36RqyftyCDq5OShgQS/JF4V+zm0nQjK6LAHBQ==\n",
+      "expected": {
+        "format_ok": true,
+        "govpid_ok": true,
+        "signature_ok": true,
+        "core_valid": true,
+        "govp_id": "GOVP-DOC-86921fe3d779",
+        "signing_input_sha256": "73002bc9ed71c614c0ff56a3b167ccdd8488b80e4c995f2c244a7c99dd7bb1f8"
+      }
+    },
+    {
+      "name": "12-valid-fractional-generated-at",
+      "description": "RFC 3339 fractional seconds have the same format verdict on every supported Python runtime",
+      "record": "Version: GOVP-1\nCanonical: https://fractional-time.example/.well-known/govp.txt\nPublisher: Example Time Organization\nAsset-Type: document\nAsset-ID: fractional-second-interoperability\nAsset-SHA256: d93efe8beab3b89634b980b857e46db6d2e12bf303d0809bd95993e5116939fc\nEvidence: https://fractional-time.example/evidence/1\nGenerated-At: 2026-08-04T12:00:00.1Z\nGOVP-ID: GOVP-DOC-b77b4e3c42ac\nPublic-Key: 7F65SEqB/Q5cb5MCEJ8d6JYGdqV+bqwT+p3hnM3Kurs=\nSignature: g/3eI9bB2Mq0DGMuUfmEZ1N/mrF3+1g+9gy+zZjMKQ3iYUFeJ5Ggm7sQ6zDCI1cBcF93yB3jypjtjF1n87YIDw==\n",
+      "expected": {
+        "format_ok": true,
+        "govpid_ok": true,
+        "signature_ok": true,
+        "core_valid": true,
+        "govp_id": "GOVP-DOC-b77b4e3c42ac",
+        "signing_input_sha256": "da0c7162edf6ee4253df4a3070f2be6f15f47024fcabc4ecf7a4cc88b5fb9300"
+      }
+    }
+  ]
+}

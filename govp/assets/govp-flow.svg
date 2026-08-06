@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" role="img" aria-labelledby="title desc">
+  <title id="title">The GOVP verification flow</title>
+  <desc id="desc">A publisher signs a portable GOVP record, the record travels beside an artifact, and any conforming implementation verifies both locally.</desc>
+  <rect width="1200" height="300" rx="24" fill="#F6F8FC"/>
+  <path d="M0 72H1200M0 144H1200M0 216H1200M120 0V300M240 0V300M360 0V300M480 0V300M600 0V300M720 0V300M840 0V300M960 0V300M1080 0V300" stroke="#DDE5F0" stroke-width="1" opacity=".55"/>
+  <g font-family="Inter, IBM Plex Sans, Arial, sans-serif">
+    <g transform="translate(58 57)"><rect width="280" height="186" rx="18" fill="#FFFFFF" stroke="#CED8E6" stroke-width="2"/><text x="28" y="43" fill="#3E7BFA" font-family="IBM Plex Mono, monospace" font-size="15" font-weight="700" letter-spacing="2">01 · SIGN</text><text x="28" y="83" fill="#07182C" font-size="24" font-weight="700">Publisher</text><text x="28" y="118" fill="#607086" font-size="17">Signs a readable GOVP record</text><text x="28" y="145" fill="#607086" font-size="17">for the exact artifact bytes.</text></g>
+    <g transform="translate(460 57)"><rect width="280" height="186" rx="18" fill="#FFFFFF" stroke="#CED8E6" stroke-width="2"/><text x="28" y="43" fill="#3E7BFA" font-family="IBM Plex Mono, monospace" font-size="15" font-weight="700" letter-spacing="2">02 · DISTRIBUTE</text><text x="28" y="83" fill="#07182C" font-size="24" font-weight="700">Record + artifact</text><text x="28" y="118" fill="#607086" font-size="17">Travel through mirrors, archives,</text><text x="28" y="145" fill="#607086" font-size="17">email or independent systems.</text></g>
+    <g transform="translate(862 57)"><rect width="280" height="186" rx="18" fill="#07182C" stroke="#3E7BFA" stroke-width="2"/><text x="28" y="43" fill="#32D6F3" font-family="IBM Plex Mono, monospace" font-size="15" font-weight="700" letter-spacing="2">03 · VERIFY</text><text x="28" y="83" fill="#F6F8FC" font-size="24" font-weight="700">Any recipient</text><text x="28" y="118" fill="#AAB8CA" font-size="17">Checks signature and integrity</text><text x="28" y="145" fill="#AAB8CA" font-size="17">locally, with no GOVP account.</text></g>
+  </g>
+  <g fill="none" stroke="#3E7BFA" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M358 150H430"/><path d="M417 137L430 150L417 163"/><path d="M760 150H832"/><path d="M819 137L832 150L819 163"/></g>
+  <circle cx="358" cy="150" r="6" fill="#22C7E5"/><circle cx="760" cy="150" r="6" fill="#22C7E5"/>
+</svg>

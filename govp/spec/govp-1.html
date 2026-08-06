@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>The GOVP-1 Record Format · GOVP</title><meta name="description" content="Normative specification for the stable GOVP-1 wire format and verification algorithm."><meta name="theme-color" content="#07182C"><meta name="color-scheme" content="light"><meta property="og:type" content="website"><meta property="og:site_name" content="GOVP"><meta property="og:title" content="The GOVP-1 Record Format · GOVP"><meta property="og:description" content="Normative specification for the stable GOVP-1 wire format and verification algorithm."><meta property="og:image" content="https://govp.io/govp/assets/govp-social-preview.png"><meta property="og:image:width" content="1280"><meta property="og:image:height" content="640"><meta property="og:image:alt" content="GOVP — Sign once. Verify anywhere."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="The GOVP-1 Record Format · GOVP"><meta name="twitter:description" content="Normative specification for the stable GOVP-1 wire format and verification algorithm."><meta name="twitter:image" content="https://govp.io/govp/assets/govp-social-preview.png"><link rel="icon" href="/favicon.svg?v=0.1.10-20260805.1"><link rel="stylesheet" href="/govp/assets/govp.css?v=0.1.10-20260805.1"></head>
+<body><header class="site-header">
+    <div class="wrap nav">
+      <a class="brand" href="/" aria-label="GOVP home"><img class="brand-mark" src="/govp/assets/govp-mark.svg?v=0.1.10-20260805.1" alt=""><span class="brand-name">GOVP</span></a>
+      <nav class="nav-links" aria-label="Primary"><a href="/govp/download.html">Install</a><a href="/govp/docs.html">Documentation</a><a class="active" aria-current="page" href="/govp/spec/govp-1.html">Specification</a><a href="/govp/verify.html">Verify</a><a href="/govp/conformance.html">Conformance</a></nav>
+      <div class="nav-right"><a class="btn btn--ghost btn--sm" href="https://github.com/govp-protocol/govp">Source</a><button class="icon-btn nav-toggle" type="button" data-nav-toggle aria-label="Open navigation" aria-expanded="false">Menu</button></div>
+    </div>
+    <nav class="mobile-menu" data-mobile-menu aria-label="Mobile"><a href="/govp/download.html">Install</a><a href="/govp/docs.html">Documentation</a><a href="/govp/spec/govp-1.html">Specification</a><a href="/govp/verify.html">Verify</a><a href="/govp/conformance.html">Conformance</a><a href="https://github.com/govp-protocol/govp">Source</a></nav>
+  </header><main><section class="section section--tight grid-bg"><div class="wrap"><div class="measure stack-16"><span class="eyebrow">GOVP 0.1.10</span><h1 class="h1">The GOVP-1 Record Format</h1><p class="lead">Normative specification for the stable GOVP-1 wire format and verification algorithm.</p></div></div></section><hr class="section-divider"><section class="section section--tight"><div class="wrap docs-layout"><article class="prose"><p><a class="btn btn--ghost" href="/govp/spec/govp-1.txt">Download normative plain text</a></p><div class="spec-source" role="document" aria-label="Normative GOVP-1 plain text"><pre>                          The GOVP-1 Record Format
+                          Normative Specification
+
+Version:        GOVP-1
+Status:         Stable — frozen; public repository edition
+Conformance:    GOVP-CORE-CONFORMANCE-1
+Published:      2026-07
+Revision:       2026-08 verifier 0.1.8 publication hardening
+Editor:         Gemacode, a brand of Brilyetz Holding S.L.
+Canonical HTML: https://govp.io/govp/spec/govp-1.html
+License:        Apache-2.0
+
+
+ABSTRACT
+
+   GOVP is an open protocol for operational evidence. A GOVP-1 record is a
+   small, self-contained, signed text object that binds a digital asset —
+   identified by its SHA-256 fingerprint — to a publisher operating under a
+   canonical domain identity. Verification is a pure function of the record:
+   it requires no network, no account, and no cooperation from the issuer.
+
+   This document is the normative definition of the format: the exact bytes
+   an implementation must produce and accept. The prose explains; the
+   conformance vectors decide.
+
+   The key words MUST, MUST NOT, SHOULD, and MAY are to be interpreted as
+   described in RFC 2119.
+
+
+TABLE OF CONTENTS
+
+   1.  Data model
+   2.  Wire format
+   3.  Parsing
+   4.  Fields
+   5.  Canonical signing input
+   6.  Signature
+   7.  GOVP-ID derivation
+   8.  Type-code registry
+   9.  Profiles
+   10. Verification algorithm
+   11. Publication
+   12. Security considerations
+   13. Conformance
+   14. Change log
+
+
+1.  DATA MODEL
+
+   A GOVP-1 RECORD is a set of key-value FIELDS binding a digital ASSET
+   (identified by a SHA-256 fingerprint) to a PUBLISHER operating under a
+   CANONICAL DOMAIN IDENTITY, sealed with an Ed25519 SIGNATURE.
+
+   A record is self-contained: everything needed to verify it — including
+   the public key — travels inside it.
+
+
+2.  WIRE FORMAT
+
+   A record is UTF-8 text containing Unicode scalar values. Lone UTF-16
+   surrogate code points are not Unicode scalar values and MUST be rejected,
+   including when supplied through a JSON escape. Each field is one line of
+   the form
+
+      Display-Key: value
+
+   Lines beginning with "#" are comments. Comments and blank lines carry no
+   meaning and are NOT covered by the signature (see 12.2).
+
+   A field name MUST be non-empty after trimming and MUST NOT contain ":",
+   NUL, CR or LF. A field value MUST NOT contain NUL, CR or LF. These
+   restrictions keep the mapping between a field set and its line-oriented
+   signing input unambiguous, including when fields arrive in a JSON bundle.
+
+   Example (conformance vector 01-valid-document):
+
+      # GOVP public verification record
+      Version:      GOVP-1
+      Canonical:    https://winery.example/.well-known/govp.txt
+      Publisher:    winery.example
+      Asset-Type:   document
+      Asset-ID:     aviso-legal
+      Asset-SHA256: 71e5bb01f249ad18a551a218b0b5b9eb40263c64ae1c8f37dc4895
+                    1622a54734
+      License:      CC-BY-4.0
+      Profile:      GOVP-BASIC
+      Generated-At: 2026-05-31T10:00:00Z
+      GOVP-ID:      GOVP-DOC-39969a54190e
+      Public-Key:   A6EHv/POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg=
+      Signature:    uq+dPdfTRlEPPVOosgWAjpjAU+FO0E5SDl5Wo5m9RVK8Ysk/mAN9
+                    07neMZMD7ISly/VF5Rxcq0JyKwHmjg9YAg==
+
+   (Asset-SHA256 and Signature are shown wrapped for line width only; in a
+   real record each field occupies exactly one line.)
+
+   A JSON BUNDLE form MAY accompany the text record for machine
+   consumption; the text record is the canonical artifact. Every record
+   field name and value in JSON MUST be a string and MUST satisfy the same
+   name and value restrictions as the text form. A bundle's asset type, id
+   and SHA-256 value MUST equal the corresponding signed record fields.
+
+
+3.  PARSING
+
+   A parser MUST process each line as follows:
+
+      trim leading and trailing GOVP-1 whitespace (defined below)
+      if empty, or starts with "#", or contains no ":"   -&gt; skip
+      split at the FIRST ":"
+      key   = ascii-lowercase(trim(left))  ; map ASCII A-Z to a-z only
+      value = trim(right)
+      map display names and legacy aliases to canonical keys
+      fields[key] = value                  ; last occurrence wins
+
+3.1 Legacy aliases
+
+   A parser MUST accept these aliases and map them to canonical keys:
+
+      type       -&gt;  asset-type
+      sha256     -&gt;  asset-sha256
+      pubkey     -&gt;  public-key
+      timestamp  -&gt;  generated-at
+
+   A parser MUST accept both LF and CRLF line endings.
+
+   "trim" in this specification removes only leading and trailing code points
+   in this frozen GOVP-1 set:
+
+      U+0009, U+000B, U+000C, U+001C..U+001F, U+0020, U+0085, U+00A0,
+      U+1680, U+2000..U+200A, U+2028, U+2029, U+202F, U+205F, U+3000.
+
+   This set freezes the behavior of the published v0.1.x reference verifier
+   and avoids future runtime- or Unicode-version-dependent canonical bytes. A
+   bare CR is not a line ending and makes the affected field invalid under
+   section 2. LF and CR are not members of the trim set because they are
+   delimiters or forbidden field content.
+
+   "ascii-lowercase" maps only the code points U+0041 through U+005A to
+   U+0061 through U+007A. Every other Unicode code point is preserved.
+   Registered field names are ASCII. This rule makes extension-field
+   behavior independent of a language runtime's Unicode case tables.
+
+
+4.  FIELDS
+
+   Key           Req.    Definition
+   ------------  ------  --------------------------------------------------
+   version       MUST    The literal "GOVP-1". Any other value is a
+                         different format.
+   canonical     MUST    Absolute HTTPS URI of the issuing identity,
+                         normally https://&lt;domain&gt;/.well-known/govp.txt.
+                         Binds the record to its domain (10.3).
+   publisher     MUST    Human-readable name of the declaring party.
+   asset-type    MUST    One of the registered type codes (8), lowercase.
+   asset-id      MUST    Stable identifier of the asset within the
+                         publisher's namespace.
+   asset-sha256  MUST    Lowercase hex SHA-256 (64 chars) of the asset
+                         bytes.
+   govp-id       MUST    Content-derived identifier (7). Verifiers
+                         recompute and compare.
+   evidence      MUST    Absolute URI where the declared asset (or its
+                         statement) is published.
+   signature     MUST    Base64 Ed25519 signature (64 bytes) over the
+                         signing input (5, 6).
+   public-key    MUST*   Base64 raw Ed25519 public key (32 bytes).
+                         *Required to verify; a record without it cannot
+                         pass 10.2.
+   generated-at  SHOULD  RFC 3339 UTC issuance time. A fractional second,
+                         when present, contains one or more decimal digits.
+                         Issuer-asserted unless anchored (9).
+   profile       MAY     Named profile label (9).
+   license       MAY     License of the published evidence.
+
+   Unknown fields MUST be preserved and included in the signing input like
+   any other field. Verifiers MUST NOT fail on unrecognized fields as long
+   as the checks of section 10 pass.
+
+   URL fields are RFC 3986 URI strings and therefore contain only visible
+   ASCII code points U+0021 through U+007E. Internationalized host names use
+   IDNA ASCII form; internationalized path, query and fragment data use UTF-8
+   percent-encoding. This makes URL validation independent of runtime URL and
+   Unicode processing differences.
+
+
+5.  CANONICAL SIGNING INPUT
+
+   The signing input is a deterministic byte string. Implementations MUST
+   construct it exactly as follows:
+
+      DOMAIN = the 15 ASCII bytes "GOVP::record.v1" followed by 0x00
+               (16 bytes total)
+
+      validate every field name and value against section 2
+
+      items  = [ (ascii-lowercase(trim(key)), trim(value))
+                 for every field except "signature"
+                 where trim(value) is non-empty ]
+
+      sort items by UTF-8 encoded key, ascending, byte-wise
+
+      lines  = concatenation of  key + ": " + value + "\n"  for each item
+               (one space after the colon; LF line terminator)
+
+      signing_input = DOMAIN + UTF8(lines)
+
+   Field order in the file, display capitalization, comments and blank
+   lines have NO effect on the signing input. Two records with the same
+   field values always produce identical bytes.
+
+   Registered GOVP-1 field names contain only ASCII. ASCII-only lowercasing
+   plus the explicit UTF-8 ordering above defines deterministic behavior for
+   preserved, unrecognized non-ASCII field names without depending on a
+   Unicode implementation or changing registered fields.
+
+   The conformance vectors pin the SHA-256 of this byte string for every
+   test record. For 01-valid-document it is:
+
+      d3263b7c87442418f76768caa4048fbad6fa108583837966a2ff04d7e1df26ff
+
+
+6.  SIGNATURE
+
+   The signature is Ed25519 (RFC 8032) over the signing input of section 5.
+
+   The public key is the 32-byte raw form, base64-encoded in "public-key".
+   The signature is the 64-byte form, base64-encoded in "signature". No
+   pre-hashing variant is used: the signing input is passed to Ed25519
+   directly.
+
+
+7.  GOVP-ID DERIVATION
+
+   The govp-id is derived from content, so independent parties compute the
+   same identifier. Implementations MUST derive it exactly as:
+
+      input   = lowercase(asset-type) + "\n"
+              + asset-id             + "\n"
+              + lowercase(asset-sha256)
+
+      govp-id = "GOVP-" + TYPECODE[asset-type] + "-"
+              + hex(SHA256(UTF8(input)))[0:12]
+
+   The separator is a literal line feed (0x0A) between the three
+   components. asset-id is NOT lowercased.
+
+   Example: document / aviso-legal / 71e5bb01...  -&gt;  GOVP-DOC-39969a54190e
+
+
+8.  TYPE-CODE REGISTRY
+
+   asset-type   Code    Meaning
+   -----------  ------  -------------------------------------------------
+   document     DOC     A document, declaration or statement.
+   dataset      DATA    A dataset snapshot.
+   model        MODEL   A trained model artifact or model card.
+   agent        AGENT   An agent's operating declaration.
+   pipeline     PIPE    A build/release pipeline record.
+   benchmark    BENCH   A benchmark result set.
+
+   New type codes are added through the governance process; additions are
+   backward-compatible.
+
+
+9.  PROFILES
+
+   The "profile" field names the guarantees and conventions a record
+   claims.
+
+9.1 Time-anchoring profiles
+
+   GOVP-BASIC     Integrity and authorship only. generated-at is
+                  issuer-asserted and NOT anchored to external time.
+   GOVP-RFC3161   The fixation is bound to an RFC 3161 timestamp from an
+                  independent TSA.
+   GOVP-QTSP      Anchored by an eIDAS qualified timestamp (QTSP).
+
+9.2 Sector profiles
+
+   Deployment conventions such as industrial-manufacturing,
+   quality-inspection, compliance-control, esg-disclosure, audit-evidence,
+   release-record, website-integrity. Sector profiles label the use case;
+   they add no cryptographic guarantee by themselves.
+
+   A record whose profile is not a time-anchoring profile MUST be treated
+   as GOVP-BASIC for time purposes.
+
+
+10. VERIFICATION ALGORITHM
+
+   A verifier MUST evaluate the following checks and report them
+   individually. The record is CORE-VALID only if all applicable checks
+   pass.
+
+10.1 format
+
+   All MUST fields of section 4 are present and non-empty, and "version"
+   equals "GOVP-1". Their values MUST also satisfy the forms defined in
+   section 4: canonical is absolute HTTPS, asset-type is registered,
+   asset-sha256 is 64 lowercase hexadecimal characters, govp-id has its
+   registered type-code form, evidence is an absolute URI, and public-key and
+   signature decode to 32 and 64 bytes respectively. If generated-at is
+   present, it is an RFC 3339 UTC timestamp ending in "Z". Fractional-second
+   width MUST NOT cause different format verdicts on different runtimes.
+   Field names and values MUST also satisfy the unambiguous line restrictions
+   of section 2.
+
+10.2 signature
+
+   Rebuild the signing input (5) from the parsed fields and verify the
+   Ed25519 signature against "public-key".
+
+10.3 canonical binding (conditional)
+
+   When the record was fetched from a URL, that final URL MUST equal the
+   "canonical" field. Scheme and host are compared case-insensitively;
+   explicit ports, path, query and fragment are compared exactly. An absent
+   port is not equivalent to an explicit default port. When verifying a local
+   file offline, this check is skipped and MUST be reported as NOT EVALUATED
+   — not as passed.
+
+10.4 govp-id
+
+   Re-derive per section 7 and compare with the declared "govp-id".
+
+10.5 asset hash (conditional)
+
+   When the asset bytes are available, their SHA-256 MUST equal
+   "asset-sha256".
+
+   Verification is a pure function of the record (and optionally the
+   asset). It requires no network, no account, and no contact with the
+   issuer or with GOVP.
+
+
+11. PUBLICATION
+
+   An issuing domain SHOULD publish:
+
+      /.well-known/govp.txt          the domain's own identity record
+      /.well-known/govp/index.json   discovery index of published records
+      /.well-known/govp/&lt;id&gt;.govp    each record, self-contained
+
+   The canonical field of every remotely verified record MUST name the
+   exact final URL from which that record is retrieved. Therefore
+   /.well-known/govp.txt is canonical for the domain identity record, while
+   a record published at /.well-known/govp/&lt;id&gt;.govp names that exact URL.
+   A byte-for-byte copy retaining a different canonical remains verifiable
+   offline but fails the conditional canonical-binding check at the copy URL.
+
+   Read endpoints SHOULD be served with "Access-Control-Allow-Origin: *":
+   evidence is public and must verify from any origin. Records SHOULD be
+   served as text/plain; charset=utf-8.
+
+   Durability depends on a surviving copy (domain, mirror or exported
+   bundle). Publication at the canonical URL is the primary copy, not the
+   only one.
+
+
+12. SECURITY CONSIDERATIONS
+
+12.1 Issuer-asserted time
+
+   Under GOVP-BASIC, "generated-at" is a claim by the issuer; a determined
+   issuer can backdate a bare record. Only the anchoring profiles (9.1) or
+   independent witnesses make time provable. Implementations MUST NOT
+   present BASIC time as independently anchored.
+
+12.2 Comments are unsigned
+
+   Comment lines are outside the signing input. An attacker can add or
+   alter comments without breaking the signature; renderers MUST NOT
+   present comment content as verified.
+
+12.3 Domain binding limits
+
+   The canonical check (10.3) detects re-hosting only when the record is
+   fetched from a URL. A record shared as a file proves integrity and
+   authorship of its fields — including the claimed canonical — but not
+   that the domain currently serves it.
+
+12.4 Key custody
+
+   Whoever holds the private key can issue records for that identity. Keys
+   MUST be kept out of the web root; high-value signing SHOULD use an
+   external signer (KMS/HSM).
+
+12.5 Hash agility
+
+   GOVP-1 fixes SHA-256 and Ed25519. A migration to other primitives is a
+   new format version, never a silent change.
+
+12.6 Scope of the guarantee
+
+   GOVP proves the integrity and authorship of a declaration. It does NOT
+   prove that the declaration is true, that a physical event occurred as
+   described, or that a party acted correctly.
+
+12.7 URLs are untrusted data
+
+   A valid signature does not make a linked resource safe. Consumers MUST
+   treat canonical and evidence URLs as untrusted input, MUST NOT execute
+   their contents, and SHOULD apply normal download size and content-handling
+   limits. The canonical identity requires HTTPS. Evidence URLs may use other
+   absolute schemes, whose handling remains a consumer policy; GOVP does not
+   replace endpoint security.
+
+12.8 Display safety
+
+   Non-URL field values and extension fields may contain signed Unicode code
+   points that are not prohibited by section 2. Consumers MUST serialize and
+   escape field names and values before display, MUST NOT interpret them as
+   markup or terminal control, and SHOULD surface implementation advisories
+   for non-printable signed text. Such advisories do not alter the signed
+   bytes or GOVP-1 core validity.
+
+
+13. CONFORMANCE
+
+   An implementation conforms to GOVP-1 if and only if it reproduces every
+   vector of GOVP-CORE-CONFORMANCE-1 exactly: the same canonical bytes
+   (pinned by signing-input SHA-256), the same derived GOVP-ID, and the
+   same per-check verdicts.
+
+   An implementation that accepts the optional JSON record or bundle form
+   MUST also reproduce GOVP-JSON-CONFORMANCE-1.
+
+   Text vectors:  https://govp.io/govp/conformance/vectors.json
+   JSON vectors:  https://govp.io/govp/conformance/json-vectors.json
+
+
+14. CHANGE LOG
+
+   2026-08   Verifier 0.1.8 publication hardening: made RFC 3339 fractional
+             seconds version-independent; clarified RFC 3986 ASCII URI input;
+             and documented presentation advisories. Existing signing inputs,
+             signatures, GOVP-IDs and the first eleven text vectors are
+             unchanged.
+
+   2026-08   Public-repository audit clarification: froze the exact trim set
+             already used by the published v0.1.x verifier; bare CR remains
+             invalid; generated-at, when present, is validated as RFC 3339
+             UTC; and canonical URL comparison is fully specified. Corrected
+             the stated byte length of the domain-separation label. No
+             previously valid GOVP-1 signing input changes.
+
+   2026-07   GOVP CLI 0.1.6 conformance clarification: field names use
+             ASCII-only lowercasing; JSON fields are strings; and field
+             names and values reject delimiters that could make two
+             different field sets share one signing input. Added text and
+             JSON vectors for the clarified behavior. No previously valid
+             published text record changes its signing input.
+
+   2026-07   Editorial clarification: byte-wise ordering of field names is
+             ordering of their UTF-8 encoding. This does not alter any
+             registered GOVP-1 field or published signing input.
+
+   2026-07   Conformance clarification: format validation enforces the
+             value forms already defined by section 4 and the published
+             JSON schema.
+
+   2026-07   First publication of the normative text for the frozen GOVP-1
+             format, matching the reference implementations and
+             GOVP-CORE-CONFORMANCE-1.
+
+   Amendments follow the published governance process. Editorial fixes may
+   be applied in place; any change to canonical bytes mints a new format
+   version.
+
+
+CITATION
+
+   Gemacode. "The GOVP-1 Record Format — Normative
+   Specification", version GOVP-1, July 2026.
+   https://govp.io/govp/spec/govp-1.html
+
+                                  # # #
+</pre></div></article></div></section></main><footer class="site-footer"><div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-about"><a class="brand" href="/"><img class="brand-mark" src="/govp/assets/govp-mark.svg?v=0.1.10-20260805.1" alt=""><span class="brand-name">GOVP</span></a><p>Open protocol for independently verifiable digital artifacts.</p></div>
+      <div class="footer-col"><h4>Protocol</h4><a href="/govp/spec/govp-1.html">GOVP-1</a><a href="/govp/status.html">Status &amp; rotation</a><a href="/govp/conformance.html">Conformance</a><a href="/govp/schemas/govp-1.schema.json">JSON Schema</a></div>
+      <div class="footer-col"><h4>Use</h4><a href="/govp/download.html">Install GOVP</a><a href="/govp/quickstart.html">Quick start</a><a href="/govp/integration.html">Integration</a><a href="/govp/verify.html">Browser verifier</a></div>
+      <div class="footer-col"><h4>Project</h4><a href="/govp/governance.html">Governance</a><a href="/govp/security.html">Security</a><a href="https://github.com/govp-protocol/govp">GitHub</a></div>
+    </div>
+    <div class="footer-base"><p>GOVP 0.1.10 · Apache-2.0 · Copyright Brilyetz Holding S.L. · Gemacode is a brand of Brilyetz Holding S.L.</p><div class="footer-legal"><a href="https://github.com/govp-protocol/govp/blob/main/LICENSE">License</a><a href="https://github.com/govp-protocol/govp/blob/main/TRADEMARKS.md">Trademarks</a><a href="mailto:research@gemacode.org">Contact</a></div></div>
+  </div></footer><script src="/govp/assets/govp.js?v=0.1.10-20260805.1"></script></body></html>

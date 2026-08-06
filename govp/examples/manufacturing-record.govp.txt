@@ -1,0 +1,15 @@
+# GOVP public verification record
+# Synthetic fixture: reserved example domain, no production or customer data
+# Verify locally with the bundled manufacturing-record.statement.txt asset
+Version: GOVP-1
+Canonical: https://manufacturer.example/.well-known/govp.txt
+Publisher: Example Manufacturing Organization
+Asset-Type: document
+Asset-ID: SAMPLE-LOT-0001
+Asset-SHA256: 2e6870bced11f1ddf51a5ce5514244b9e670c553560915b6c13ea6b49263a2d0
+Profile: industrial-manufacturing
+Generated-At: 2026-08-04T12:00:00Z
+GOVP-ID: GOVP-DOC-cb352d4b8a77
+Evidence: https://manufacturer.example/evidence/sample-manufacturing-record.txt
+Public-Key: IXxXtLEM5a0OxZqhFTv3Z6yR/zV/pZ2yFx2VGGyr34g=
+Signature: YM9VhQ7d/Wihmn8z4sA8WxT7Gz9pejxAU5DdnG51cnJVwxEhDkPhH5nZzXudPzja/nfGqoTrstDpxSy6k1kqDw==

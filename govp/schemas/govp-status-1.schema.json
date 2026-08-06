@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://govp.io/govp/schemas/govp-status-1.schema.json",
+  "title": "GOVP-STATUS-1 online status document",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "canonical",
+    "publisher",
+    "authority",
+    "generated_at",
+    "keys",
+    "revoked_records"
+  ],
+  "properties": {
+    "format": { "const": "GOVP-STATUS-1" },
+    "canonical": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://[^\\s]+$"
+    },
+    "publisher": { "type": "string", "minLength": 1 },
+    "authority": { "const": "https-origin" },
+    "generated_at": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"
+    },
+    "keys": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/keyStatus" }
+    },
+    "revoked_records": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/recordRevocation" }
+    }
+  },
+  "$defs": {
+    "keyStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key_id", "public_key", "state", "changed_at"],
+      "properties": {
+        "key_id": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "public_key": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9+/]{43}=$"
+        },
+        "state": { "enum": ["active", "retired", "revoked"] },
+        "changed_at": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"
+        }
+      }
+    },
+    "recordRevocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["govp_id", "revoked_at", "reason"],
+      "properties": {
+        "govp_id": {
+          "type": "string",
+          "pattern": "^GOVP-(DOC|DATA|MODEL|AGENT|PIPE|BENCH)-[0-9a-f]{12}$"
+        },
+        "revoked_at": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"
+        },
+        "reason": {
+          "enum": ["compromised", "superseded", "withdrawn", "cessation", "other"]
+        }
+      }
+    }
+  }
+}

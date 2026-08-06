@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://govp.io/sitemap.xml

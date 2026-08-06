@@ -1,0 +1,16 @@
+{
+  "format": "GOVP-STATUS-1",
+  "canonical": "https://govp.io/.well-known/govp/revoked.json",
+  "publisher": "GOVP Protocol — Gemacode",
+  "authority": "https-origin",
+  "generated_at": "2026-08-05T22:07:54Z",
+  "keys": [
+    {
+      "key_id": "sha256:41c4d691ddfa7abd6bd279abe6b59b074922c3f128160d6b2cf1937a74f2bbac",
+      "public_key": "jgLoQnTwnFLl8uXniEg2INX91Lxao1r8+ikmLQp8wOE=",
+      "state": "active",
+      "changed_at": "2026-08-05T20:58:38Z"
+    }
+  ],
+  "revoked_records": []
+}

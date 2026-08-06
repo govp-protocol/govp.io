@@ -1,0 +1,12 @@
+GOVP protocol publication identity
+
+Domain: govp.io
+Protocol: GOVP-1
+Steward: Gemacode
+Rights holder: Brilyetz Holding S.L.
+Purpose: Canonical publication of the open GOVP protocol, specification,
+conformance vectors and reference verifier.
+Contact: research@gemacode.org
+
+This statement contains public project information only. It does not identify
+customers, users or private products and it contains no credentials.

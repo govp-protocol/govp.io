@@ -1,0 +1,56 @@
+name: public protocol monitor
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: govp-public-monitor
+  cancel-in-progress: false
+
+jobs:
+  public-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14"
+
+      - name: Install the exact public verifier
+        run: python -m pip install --disable-pip-version-check govp==0.1.10
+
+      - name: Verify canonical identity, discovered record and live status
+        run: |
+          govp verify-url https://govp.io/.well-known/govp.txt
+          govp verify-url https://govp.io/.well-known/govp/GOVP-DOC-1863bfac05f9.govp
+          govp verify-url https://govp.io/.well-known/govp/GOVP-DOC-2f134146263e.govp
+          govp status-url https://govp.io/.well-known/govp.txt \
+            --status-url https://govp.io/.well-known/govp/revoked.json
+          govp status-url https://govp.io/.well-known/govp/GOVP-DOC-2f134146263e.govp \
+            --status-url https://govp.io/.well-known/govp/revoked.json
+
+      - name: Validate public HTTP contracts
+        run: |
+          curl --fail --silent --show-error --location https://govp.io/ >/dev/null
+          curl --fail --silent --show-error https://govp.io/.well-known/govp/index.json \
+            | python -m json.tool >/dev/null
+          curl --fail --silent --show-error https://govp.io/.well-known/govp/revoked.json \
+            | python -m json.tool >/dev/null
+          curl --fail --silent --show-error https://govp.io/PROTOCOL-SOURCE.json \
+            | python -m json.tool >/dev/null
+          curl --fail --silent --show-error --head \
+            https://govp.io/.well-known/govp/revoked.json \
+            | tr -d '\r' | grep -i '^cache-control: no-store$'
+          test "$(curl --fail --silent --show-error --location \
+            https://github.com/govp-protocol/govp/releases/download/v0.1.10/GOVP-0.1.10-source.zip \
+            | sha256sum | cut -d' ' -f1)" = \
+            '25b1c21a734ff5f6ef56bbeafa0f570c5159ca512fc4b92c06cf34d2c4b6d6fe'

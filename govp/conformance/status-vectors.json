@@ -1,0 +1,72 @@
+{
+  "format": "GOVP-STATUS-CONFORMANCE-1",
+  "description": "Schema-level GOVP-STATUS-1 acceptance and rejection vectors.",
+  "vectors": [
+    {
+      "name": "active-key-empty-revocations",
+      "status": {
+        "format": "GOVP-STATUS-1",
+        "canonical": "https://example.test/.well-known/govp/revoked.json",
+        "publisher": "Example issuer",
+        "authority": "https-origin",
+        "generated_at": "2026-08-05T00:00:00Z",
+        "keys": [
+          {
+            "key_id": "sha256:41c4d691ddfa7abd6bd279abe6b59b074922c3f128160d6b2cf1937a74f2bbac",
+            "public_key": "jgLoQnTwnFLl8uXniEg2INX91Lxao1r8+ikmLQp8wOE=",
+            "state": "active",
+            "changed_at": "2026-08-05T00:00:00Z"
+          }
+        ],
+        "revoked_records": []
+      },
+      "expected": { "schema_valid": true }
+    },
+    {
+      "name": "explicit-record-revocation",
+      "status": {
+        "format": "GOVP-STATUS-1",
+        "canonical": "https://example.test/.well-known/govp/revoked.json",
+        "publisher": "Example issuer",
+        "authority": "https-origin",
+        "generated_at": "2026-08-05T01:00:00Z",
+        "keys": [
+          {
+            "key_id": "sha256:41c4d691ddfa7abd6bd279abe6b59b074922c3f128160d6b2cf1937a74f2bbac",
+            "public_key": "jgLoQnTwnFLl8uXniEg2INX91Lxao1r8+ikmLQp8wOE=",
+            "state": "active",
+            "changed_at": "2026-08-05T00:00:00Z"
+          }
+        ],
+        "revoked_records": [
+          {
+            "govp_id": "GOVP-DOC-1863bfac05f9",
+            "revoked_at": "2026-08-05T01:00:00Z",
+            "reason": "withdrawn"
+          }
+        ]
+      },
+      "expected": { "schema_valid": true }
+    },
+    {
+      "name": "reject-unknown-key-state",
+      "status": {
+        "format": "GOVP-STATUS-1",
+        "canonical": "https://example.test/.well-known/govp/revoked.json",
+        "publisher": "Example issuer",
+        "authority": "https-origin",
+        "generated_at": "2026-08-05T00:00:00Z",
+        "keys": [
+          {
+            "key_id": "sha256:41c4d691ddfa7abd6bd279abe6b59b074922c3f128160d6b2cf1937a74f2bbac",
+            "public_key": "jgLoQnTwnFLl8uXniEg2INX91Lxao1r8+ikmLQp8wOE=",
+            "state": "unknown",
+            "changed_at": "2026-08-05T00:00:00Z"
+          }
+        ],
+        "revoked_records": []
+      },
+      "expected": { "schema_valid": false }
+    }
+  ]
+}

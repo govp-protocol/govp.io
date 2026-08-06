@@ -1,0 +1,21 @@
+{
+  "canonical": "https://govp.io/.well-known/govp.txt",
+  "format": "GOVP-DISCOVERY-1",
+  "generated_at": "2026-08-05T22:33:28Z",
+  "publisher": "govp.io",
+  "status": "https://govp.io/.well-known/govp/revoked.json",
+  "records": [
+    {
+      "asset": "https://govp.io/.well-known/govp/govp.io-stewardship.txt",
+      "asset_sha256": "d762a715e7da61710efea47ca140cd51af08aafd9e019ad39bc9001cff084fb5",
+      "govp_id": "GOVP-DOC-1863bfac05f9",
+      "record": "https://govp.io/.well-known/govp/GOVP-DOC-1863bfac05f9.govp"
+    },
+    {
+      "asset": "https://github.com/govp-protocol/govp/releases/download/v0.1.10/GOVP-0.1.10-source.zip",
+      "asset_sha256": "25b1c21a734ff5f6ef56bbeafa0f570c5159ca512fc4b92c06cf34d2c4b6d6fe",
+      "govp_id": "GOVP-DOC-2f134146263e",
+      "record": "https://govp.io/.well-known/govp/GOVP-DOC-2f134146263e.govp"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+# GOVP public protocol identity record
+# Public project data only; comments are not signed
+Version: GOVP-1
+Canonical: https://govp.io/.well-known/govp.txt
+Publisher: GOVP Protocol — Gemacode
+Asset-Type: document
+Asset-ID: govp.io/protocol-publication-identity
+Asset-SHA256: d762a715e7da61710efea47ca140cd51af08aafd9e019ad39bc9001cff084fb5
+License: Apache-2.0
+Profile: GOVP-BASIC
+Generated-At: 2026-08-05T20:58:38Z
+GOVP-ID: GOVP-DOC-1863bfac05f9
+Evidence: https://govp.io/.well-known/govp/govp.io-stewardship.txt
+Public-Key: jgLoQnTwnFLl8uXniEg2INX91Lxao1r8+ikmLQp8wOE=
+Signature: SnMClBpb5zNWWKI84Xz7Fh20CP7fRXhQ/h0o1c6lO/NX7RiLZgoN5QsvJe8jEo8MJqug7nzlJDIiE4FsygW3BQ==

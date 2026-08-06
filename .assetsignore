@@ -1,0 +1,16 @@
+# Repository-only files that must not become static website assets.
+.git
+.github
+.wrangler
+node_modules
+tests
+tools
+dist
+worker.js
+worker-configuration.d.ts
+wrangler.jsonc
+.assetsignore
+.gitignore
+package.json
+package-lock.json
+*.md

@@ -1,0 +1,118 @@
+{
+  "suite": "GOVP-JSON-CONFORMANCE-1",
+  "description": "JSON record and bundle input vectors. Field names and values are textual and cannot contain ambiguous line-oriented delimiters.",
+  "vectors": [
+    {
+      "name": "01-valid-record-object",
+      "payload": {
+        "Version": "GOVP-1",
+        "Canonical": "https://winery.example/.well-known/govp.txt",
+        "Publisher": "winery.example",
+        "Asset-Type": "document",
+        "Asset-ID": "aviso-legal",
+        "Asset-SHA256": "71e5bb01f249ad18a551a218b0b5b9eb40263c64ae1c8f37dc48951622a54734",
+        "License": "CC-BY-4.0",
+        "Profile": "GOVP-BASIC",
+        "Generated-At": "2026-05-31T10:00:00Z",
+        "GOVP-ID": "GOVP-DOC-39969a54190e",
+        "Evidence": "https://winery.example/ev/1",
+        "Public-Key": "A6EHv/POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg=",
+        "Signature": "uq+dPdfTRlEPPVOosgWAjpjAU+FO0E5SDl5Wo5m9RVK8Ysk/mAN907neMZMD7ISly/VF5Rxcq0JyKwHmjg9YAg=="
+      },
+      "expected": {
+        "load_ok": true,
+        "core_valid": true
+      }
+    },
+    {
+      "name": "02-valid-bundle",
+      "payload": {
+        "format": "GOVP-1",
+        "record": {
+          "Version": "GOVP-1",
+          "Canonical": "https://winery.example/.well-known/govp.txt",
+          "Publisher": "winery.example",
+          "Asset-Type": "document",
+          "Asset-ID": "aviso-legal",
+          "Asset-SHA256": "71e5bb01f249ad18a551a218b0b5b9eb40263c64ae1c8f37dc48951622a54734",
+          "License": "CC-BY-4.0",
+          "Profile": "GOVP-BASIC",
+          "Generated-At": "2026-05-31T10:00:00Z",
+          "GOVP-ID": "GOVP-DOC-39969a54190e",
+          "Evidence": "https://winery.example/ev/1",
+          "Public-Key": "A6EHv/POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg=",
+          "Signature": "uq+dPdfTRlEPPVOosgWAjpjAU+FO0E5SDl5Wo5m9RVK8Ysk/mAN907neMZMD7ISly/VF5Rxcq0JyKwHmjg9YAg=="
+        },
+        "asset": {
+          "type": "document",
+          "id": "aviso-legal",
+          "hash": {
+            "alg": "sha256",
+            "value": "71e5bb01f249ad18a551a218b0b5b9eb40263c64ae1c8f37dc48951622a54734"
+          }
+        }
+      },
+      "expected": {
+        "load_ok": true,
+        "core_valid": true
+      }
+    },
+    {
+      "name": "03-reject-line-injection",
+      "payload": {
+        "version": "GOVP-1",
+        "publisher": "winery.example\nq: injected"
+      },
+      "expected": {
+        "load_ok": false,
+        "error": "cannot contain"
+      }
+    },
+    {
+      "name": "04-reject-non-string-value",
+      "payload": {
+        "version": "GOVP-1",
+        "asset-id": 7
+      },
+      "expected": {
+        "load_ok": false,
+        "error": "must be strings"
+      }
+    },
+    {
+      "name": "05-reject-colon-in-json-key",
+      "payload": {
+        "version": "GOVP-1",
+        "x:injected": "value"
+      },
+      "expected": {
+        "load_ok": false,
+        "error": "field names"
+      }
+    },
+    {
+      "name": "06-reject-bundle-asset-mismatch",
+      "payload": {
+        "format": "GOVP-1",
+        "record": {
+          "version": "GOVP-1",
+          "asset-type": "document",
+          "asset-id": "signed-id",
+          "asset-sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "asset": {
+          "type": "document",
+          "id": "different-id",
+          "hash": {
+            "alg": "sha256",
+            "value": "0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        }
+      },
+      "expected": {
+        "load_ok": false,
+        "error": "must match"
+      }
+    }
+  ]
+}

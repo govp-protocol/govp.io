@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://govp.io/govp/schemas/govp-1.schema.json",
+  "title": "GOVP-1 record or bundle",
+  "description": "Machine-readable contract for canonical or display-key GOVP-1 record fields and the optional JSON bundle form. The UTF-8 text record remains canonical.",
+  "oneOf": [
+    { "$ref": "#/$defs/record" },
+    { "$ref": "#/$defs/bundle" }
+  ],
+  "$defs": {
+    "canonicalRecord": {
+      "title": "Normalized GOVP-1 record",
+      "description": "Record fields keyed by canonical lowercase names. Unknown extension fields remain signed.",
+      "type": "object",
+      "propertyNames": {
+        "description": "Field names are non-empty and cannot contain colon, NUL, CR or LF.",
+        "pattern": "^[^:\\u0000\\r\\n]+$"
+      },
+      "required": [
+        "version",
+        "canonical",
+        "publisher",
+        "asset-type",
+        "asset-id",
+        "asset-sha256",
+        "govp-id",
+        "evidence",
+        "public-key",
+        "signature"
+      ],
+      "properties": {
+        "version": {
+          "description": "Wire-format version. Any other value is a different format.",
+          "const": "GOVP-1"
+        },
+        "canonical": {
+          "description": "Absolute HTTPS RFC 3986 URI of the issuing identity, using visible ASCII text, normally https://<domain>/.well-known/govp.txt.",
+          "type": "string",
+          "format": "uri",
+          "pattern": "^[Hh][Tt][Tt][Pp][Ss]://(?:[A-Za-z0-9._~:/?#\\[\\]@!$&'()*+,;=\\-]|%[0-9A-Fa-f]{2})+$"
+        },
+        "publisher": {
+          "description": "Human-readable name of the declaring party.",
+          "type": "string",
+          "minLength": 1
+        },
+        "asset-type": {
+          "description": "Registered asset type, lowercase.",
+          "type": "string",
+          "enum": ["document", "dataset", "model", "agent", "pipeline", "benchmark"]
+        },
+        "asset-id": {
+          "description": "Stable identifier within the publisher namespace. Case-sensitive.",
+          "type": "string",
+          "minLength": 1
+        },
+        "asset-sha256": {
+          "description": "Lowercase hexadecimal SHA-256 of the asset bytes.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "govp-id": {
+          "description": "Content-derived GOVP identifier.",
+          "type": "string",
+          "pattern": "^GOVP-(DOC|DATA|MODEL|AGENT|PIPE|BENCH)-[0-9a-f]{12}$"
+        },
+        "evidence": {
+          "description": "Absolute RFC 3986 URI where the declared asset or statement is published, using visible ASCII text.",
+          "type": "string",
+          "format": "uri",
+          "pattern": "^(?:[A-Za-z0-9._~:/?#\\[\\]@!$&'()*+,;=\\-]|%[0-9A-Fa-f]{2})+$"
+        },
+        "signature": {
+          "description": "Base64-encoded 64-byte Ed25519 signature.",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9+/]{86}==$"
+        },
+        "public-key": {
+          "description": "Base64-encoded 32-byte raw Ed25519 public key.",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9+/]{43}=$"
+        },
+        "generated-at": {
+          "description": "RFC 3339 UTC issuance time ending in Z. Issuer-asserted unless independently anchored.",
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"
+        },
+        "profile": {
+          "description": "Named time-anchoring or sector profile.",
+          "type": "string"
+        },
+        "license": {
+          "description": "License of the published evidence.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": {
+        "description": "Unknown fields are preserved and included in the signing input.",
+        "type": "string",
+        "pattern": "^[^\\u0000\\r\\n]*$"
+      }
+    },
+    "displayRecord": {
+      "title": "Display-key GOVP-1 record",
+      "description": "Wire-compatible JSON object using the published display field names.",
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/canonicalRecord/propertyNames"
+      },
+      "required": [
+        "Version",
+        "Canonical",
+        "Publisher",
+        "Asset-Type",
+        "Asset-ID",
+        "Asset-SHA256",
+        "GOVP-ID",
+        "Evidence",
+        "Public-Key",
+        "Signature"
+      ],
+      "properties": {
+        "Version": { "$ref": "#/$defs/canonicalRecord/properties/version" },
+        "Canonical": { "$ref": "#/$defs/canonicalRecord/properties/canonical" },
+        "Publisher": { "$ref": "#/$defs/canonicalRecord/properties/publisher" },
+        "Asset-Type": { "$ref": "#/$defs/canonicalRecord/properties/asset-type" },
+        "Asset-ID": { "$ref": "#/$defs/canonicalRecord/properties/asset-id" },
+        "Asset-SHA256": { "$ref": "#/$defs/canonicalRecord/properties/asset-sha256" },
+        "GOVP-ID": { "$ref": "#/$defs/canonicalRecord/properties/govp-id" },
+        "Evidence": { "$ref": "#/$defs/canonicalRecord/properties/evidence" },
+        "Public-Key": { "$ref": "#/$defs/canonicalRecord/properties/public-key" },
+        "Signature": { "$ref": "#/$defs/canonicalRecord/properties/signature" },
+        "Generated-At": { "$ref": "#/$defs/canonicalRecord/properties/generated-at" },
+        "Profile": { "$ref": "#/$defs/canonicalRecord/properties/profile" },
+        "License": { "$ref": "#/$defs/canonicalRecord/properties/license" }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/canonicalRecord/additionalProperties"
+      }
+    },
+    "record": {
+      "title": "GOVP-1 JSON record",
+      "oneOf": [
+        { "$ref": "#/$defs/canonicalRecord" },
+        { "$ref": "#/$defs/displayRecord" }
+      ]
+    },
+    "bundle": {
+      "title": "GOVP-1 JSON bundle",
+      "description": "Optional machine-consumption companion. Asset identity and hash must equal the signed record fields.",
+      "type": "object",
+      "required": ["format", "record", "asset"],
+      "properties": {
+        "format": { "const": "GOVP-1" },
+        "record": { "$ref": "#/$defs/record" },
+        "asset": {
+          "type": "object",
+          "required": ["type", "id", "hash"],
+          "properties": {
+            "type": { "type": "string" },
+            "id": { "type": "string" },
+            "hash": {
+              "type": "object",
+              "required": ["alg", "value"],
+              "properties": {
+                "alg": { "const": "sha256" },
+                "value": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "verification": {
+          "description": "Optional informational verification result. Consumers must re-verify.",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    "verificationResult": {
+      "title": "Verification result",
+      "description": "Per-check result. Canonical and asset are null when not evaluated.",
+      "type": "object",
+      "required": ["ok", "checks"],
+      "properties": {
+        "ok": { "type": "boolean" },
+        "checks": {
+          "type": "object",
+          "required": ["format", "signature", "govp-id", "canonical", "asset"],
+          "properties": {
+            "format": { "type": "boolean" },
+            "signature": { "type": "boolean" },
+            "govp-id": { "type": "boolean" },
+            "canonical": { "type": ["boolean", "null"] },
+            "asset": { "type": ["boolean", "null"] }
+          },
+          "additionalProperties": false
+        },
+        "warnings": {
+          "description": "Non-fatal reference-verifier advisories. They do not alter GOVP-1 core validity.",
+          "type": "array",
+          "items": {
+            "enum": [
+              "non-http-evidence-scheme",
+              "signed-non-printable-text"
+            ]
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
