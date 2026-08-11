@@ -27,8 +27,44 @@ jobs:
           node-version: 24
           cache: npm
 
+      - name: Use Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14"
+
       - name: Install locked dependencies
-        run: npm ci
+        run: |
+          npm ci
+          python -m pip install --disable-pip-version-check govp==0.1.13
+
+      - name: Build and verify the real static publication
+        env:
+          GOVP_PUBLICATION_DOMAIN_KEY: ${{ secrets.GOVP_PUBLICATION_DOMAIN_KEY }}
+        run: |
+          key_path="$RUNNER_TEMP/govp-publication-domain.pem"
+          public_path="$RUNNER_TEMP/govp-publication-site"
+          custody_path="$RUNNER_TEMP/govp-publication-custody"
+          proof_path="$RUNNER_TEMP/govp-publication-proof.json"
+          printf '%s' "$GOVP_PUBLICATION_DOMAIN_KEY" > "$key_path"
+          chmod 600 "$key_path"
+          python tools/build-publication-demo.py \
+            --domain-key "$key_path" \
+            --public-dir "$public_path" \
+            --custody-dir "$custody_path" \
+            --export-proof "$proof_path"
+          cp -R "$public_path/.well-known/." .well-known/
+          cp "$proof_path" govp/examples/publication-proof.json
+          govp publication verify govp/examples/publication-proof.json --tree .
+          test "$(find "$custody_path/proofs" -type f | wc -l | tr -d ' ')" = 2
+          test "$(find .well-known -type f -name '*sealed*' | wc -l | tr -d ' ')" = 0
+
+      - name: Retain private synthetic custody separately
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: govp-publication-custody-${{ github.run_id }}
+          path: ${{ runner.temp }}/govp-publication-custody/
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Rebuild and validate
         run: |
