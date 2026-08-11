@@ -235,12 +235,13 @@ test('govp.io publishes a valid canonical identity and discovery record', async 
   assert.equal(status.canonical, index.status);
   assert.equal(status.authority, 'https-origin');
   assert.deepEqual(status.revoked_records, []);
-  assert.equal(status.keys.length, 4);
+  assert.equal(status.keys.length, 5);
   const expectedKeys = new Set([
     result.fields['public-key'],
     releaseResult.fields['public-key'],
     policyResult.fields['public-key'],
     'bxL1FZJ/IbNcy8N6G2jybxvj4WJQ4emOeay/qiEQY5w=',
+    '64rdyw5Klras9nhat+tHG3SSTzaDkz0PcY5emkqdQYI=',
   ]);
   for (const key of status.keys) {
     assert.equal(expectedKeys.delete(key.public_key), true);
