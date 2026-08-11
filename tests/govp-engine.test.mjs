@@ -241,7 +241,7 @@ test('govp.io publishes a valid canonical identity and discovery record', async 
     releaseResult.fields['public-key'],
     policyResult.fields['public-key'],
     'bxL1FZJ/IbNcy8N6G2jybxvj4WJQ4emOeay/qiEQY5w=',
-    '64rdyw5Klras9nhat+tHG3SSTzaDkz0PcY5emkqdQYI=',
+    'UUreW735m38nOkXHsvv435NkZnCQ4Lyit7XIRVOyKx8=',
   ]);
   for (const key of status.keys) {
     assert.equal(expectedKeys.delete(key.public_key), true);
