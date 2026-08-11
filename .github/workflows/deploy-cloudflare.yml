@@ -37,6 +37,14 @@ jobs:
           npm ci
           python -m pip install --disable-pip-version-check govp==0.1.13
 
+      - name: Rebuild and validate the versioned site
+        run: |
+          npm run build
+          git diff --exit-code
+          npm test
+          npm audit --audit-level=low
+          npm run check:deploy
+
       - name: Build and verify the real static publication
         env:
           GOVP_PUBLICATION_DOMAIN_KEY: ${{ secrets.GOVP_PUBLICATION_DOMAIN_KEY }}
@@ -65,14 +73,6 @@ jobs:
           path: ${{ runner.temp }}/govp-publication-custody/
           if-no-files-found: error
           retention-days: 7
-
-      - name: Rebuild and validate
-        run: |
-          npm run build
-          git diff --exit-code
-          npm test
-          npm audit --audit-level=low
-          npm run check:deploy
 
       - name: Deploy the validated Worker
         run: npm exec wrangler deploy
