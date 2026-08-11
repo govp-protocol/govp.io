@@ -159,7 +159,7 @@ def main() -> int:
         public_dir=arguments.public_dir,
         custody_dir=arguments.custody_dir,
     )
-    if public_envelope is None or output.public_count != 1 or output.private_count != 1:
+    if public_envelope is None or output.public_count != 1 or output.sealed_count != 1:
         raise SystemExit("publication output counts are invalid")
     entry_id = publication_entry_id(event_descriptor(public_envelope))
     arguments.export_proof.parent.mkdir(parents=True, exist_ok=True)
@@ -172,7 +172,7 @@ def main() -> int:
             {
                 "batch_id": request["batch_id"],
                 "entry_id": entry_id,
-                "private_count": output.private_count,
+                "sealed_count": output.sealed_count,
                 "public_count": output.public_count,
                 "root": output.public_root,
             },
