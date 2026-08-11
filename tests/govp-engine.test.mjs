@@ -176,7 +176,7 @@ test('govp.io publishes a valid canonical identity and discovery record', async 
   assert.equal(index.format, 'GOVP-DISCOVERY-1');
   assert.equal(index.canonical, 'https://govp.io/.well-known/govp.txt');
   assert.equal(index.status, 'https://govp.io/.well-known/govp/revoked.json');
-  assert.equal(index.records.length, 2);
+  assert.equal(index.records.length, 3);
   assert.equal(index.records[0].govp_id, result.fields['govp-id']);
   assert.equal(index.records[0].asset_sha256, result.fields['asset-sha256']);
 
@@ -211,6 +211,23 @@ test('govp.io publishes a valid canonical identity and discovery record', async 
   assert.equal(releaseResult.fields['asset-sha256'], releaseEntry.asset_sha256);
   assert.equal(releaseResult.fields['govp-id'], releaseEntry.govp_id);
 
+  const policyEntry = index.records.find((entry) => (
+    entry.asset === 'https://govp.io/.well-known/govp/policies/GOVP-GATE-RELEASE-1.json'
+  ));
+  assert.ok(policyEntry, 'the gate acceptance policy must be discoverable');
+  const policyAsset = new Uint8Array(await readFile(new URL(
+    '../.well-known/govp/policies/GOVP-GATE-RELEASE-1.json', import.meta.url,
+  )));
+  const policyRecord = await readFile(new URL(
+    `../.well-known/govp/${policyEntry.govp_id}.govp`, import.meta.url,
+  ), 'utf8');
+  const policyResult = await verifyText(policyRecord, {
+    assetBytes: policyAsset,
+    fetchedUrl: policyEntry.record,
+  });
+  assert.equal(policyResult.ok, true);
+  assert.equal(policyResult.fields['asset-sha256'], policyEntry.asset_sha256);
+
   const status = JSON.parse(await readFile(new URL(
     '../.well-known/govp/revoked.json', import.meta.url,
   ), 'utf8'));
@@ -218,10 +235,12 @@ test('govp.io publishes a valid canonical identity and discovery record', async 
   assert.equal(status.canonical, index.status);
   assert.equal(status.authority, 'https-origin');
   assert.deepEqual(status.revoked_records, []);
-  assert.equal(status.keys.length, 2);
+  assert.equal(status.keys.length, 4);
   const expectedKeys = new Set([
     result.fields['public-key'],
     releaseResult.fields['public-key'],
+    policyResult.fields['public-key'],
+    'bxL1FZJ/IbNcy8N6G2jybxvj4WJQ4emOeay/qiEQY5w=',
   ]);
   for (const key of status.keys) {
     assert.equal(expectedKeys.delete(key.public_key), true);

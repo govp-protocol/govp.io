@@ -16,6 +16,18 @@
       "public_key": "3ssRh9xsWjxWlkK7zz6kpnCKCEdCr9ZfSR20e8g2Cic=",
       "state": "active",
       "changed_at": "2026-08-06T13:55:04Z"
+    },
+    {
+      "key_id": "sha256:6d72ef19eb387527da85c344bdca5e9f1ac4b48fa8019b30d772d14d4c7fee26",
+      "public_key": "YSSXXH7Amr7uhgkuKzRgGe7nGF6zjjHpbTIUfV5AWD8=",
+      "state": "active",
+      "changed_at": "2026-08-11T00:00:00Z"
+    },
+    {
+      "key_id": "sha256:cfb9c341eb48d3cfb8e4bdfabc994c8abaccbb3fe8c7386c638101be54c586c9",
+      "public_key": "bxL1FZJ/IbNcy8N6G2jybxvj4WJQ4emOeay/qiEQY5w=",
+      "state": "active",
+      "changed_at": "2026-08-11T00:00:00Z"
     }
   ],
   "revoked_records": []
