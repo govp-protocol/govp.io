@@ -31,7 +31,7 @@ jobs:
       - name: Confirm current versions across distribution surfaces
         env:
           GOVP_PYTHON_VERSION: "0.1.13"
-          GOVP_JAVASCRIPT_VERSION: "0.1.11"
+          GOVP_JAVASCRIPT_VERSION: "0.1.13"
         run: |
           python - <<'PY'
           import json
@@ -63,7 +63,7 @@ jobs:
           curl --fail --silent --show-error --location \
             "https://github.com/govp-protocol/govp-js/releases/tag/v${GOVP_JAVASCRIPT_VERSION}" >/dev/null
 
-      - name: Resolve the current release record from discovery
+      - name: Resolve the archived 0.1.11 release record from discovery
         id: release
         run: |
           record_url="$(curl --fail --silent --show-error \

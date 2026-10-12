@@ -1,10 +1,10 @@
 {
   "format": "govp-protocol-source-v1",
-  "version": "0.1.11",
+  "version": "0.1.13",
   "repository": "https://github.com/govp-protocol/govp",
-  "commit": "3c099c8e75e36fd28778c4da0ec8d0e4387690f3",
-  "tree": "4dcbb9a09d4c0c7b33a8c6f6ce556950f5aaf53c",
-  "source_zip_sha256": "89d45080fbdff7cca7efbaf1027d205ed14295c1d33e6a35be4722bb88c0296a",
+  "commit": "94ebf0a0047baddfd6bcc08eb42c5bbed295d6d1",
+  "tree": "decdb092e01f6bc22d967ab13b612be53c34b431",
+  "source_zip_sha256": "d8e3e4d1947bd7fede8d70ed75ad9f7986dbad64d638b331ab784a8f9fc38166",
   "artifacts": {
     "govp/spec/govp-1.txt": "d002832f1b17723d97d331acd0444f9dfb574e10be426b8725de8eb45d74c0e1",
     "govp/conformance/vectors.json": "97ca58bc321018b0a254c6689a7226938e60201f1e7b350b0a6b614bdc7fba27",
