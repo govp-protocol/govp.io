@@ -30,7 +30,7 @@ vectors, validates internal links and confirms hashes in `PROTOCOL-SOURCE.json`.
 ## Deploy
 
 ```sh
-npx wrangler@4.118.0 deploy
+npx wrangler@4.149.0 deploy
 ```
 
 After deployment, check the two production hostnames, security headers, the
