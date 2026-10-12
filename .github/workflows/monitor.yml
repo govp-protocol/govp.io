@@ -31,7 +31,7 @@ jobs:
       - name: Confirm current versions across distribution surfaces
         env:
           GOVP_PYTHON_VERSION: "0.1.13"
-          GOVP_JAVASCRIPT_VERSION: "0.1.10"
+          GOVP_JAVASCRIPT_VERSION: "0.1.11"
         run: |
           python - <<'PY'
           import json
