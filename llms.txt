@@ -2,16 +2,17 @@
 
 > GOVP is the open protocol for portable, independently verifiable operational evidence.
 
-Version: 0.1.11
+Version: 0.1.13
 Protocol: GOVP-1 (stable)
-Install (Python): python -m pip install govp==0.1.11
-PyPI: https://pypi.org/project/govp/0.1.11/
-Install (JavaScript): npm install @govp/verifier@0.1.8
-npm: https://www.npmjs.com/package/@govp/verifier/v/0.1.8
-Python release: https://github.com/govp-protocol/govp/releases/tag/v0.1.11
+Install (Python): python -m pip install govp==0.1.13
+PyPI: https://pypi.org/project/govp/0.1.13/
+Install (JavaScript): npm install @govp/verifier@0.1.10
+npm: https://www.npmjs.com/package/@govp/verifier/v/0.1.10
+Python release: https://github.com/govp-protocol/govp/releases/tag/v0.1.13
 Canonical protocol source: https://github.com/govp-protocol/govp
 JavaScript source: https://github.com/govp-protocol/govp-js
-Release source commit: 3c099c8e75e36fd28778c4da0ec8d0e4387690f3
+Website normative source version: 0.1.11
+Website normative source commit: 3c099c8e75e36fd28778c4da0ec8d0e4387690f3
 License: Apache-2.0
 
 Primary documentation:
