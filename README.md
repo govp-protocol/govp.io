@@ -32,6 +32,19 @@ npm test
 npx wrangler deploy --dry-run
 ```
 
+## Coordinated public version
+
+The Python package, JavaScript package and website use the coordinated GOVP
+release number in `package.json` (currently 0.1.13). The site generator uses
+that one value for both installation commands and package links.
+
+For a release, validate the Python and JavaScript distributions against the
+shared vectors, publish and verify both registry downloads, then update the
+website version, protocol provenance manifest, public monitor and organization
+profile before deploying. Historical release records and changelog entries
+retain their original versions and signatures. npm and pip tool versions are
+independent of the GOVP release number.
+
 ## Deploy
 
 Production deployment is described in [`DEPLOY-cloudflare.md`](DEPLOY-cloudflare.md).
