@@ -1,0 +1,12 @@
+Version: GOVP-1
+Canonical: https://agent.example/.well-known/agent-record.govp.txt
+Publisher: Altered Publisher
+Asset-Type: agent
+Asset-ID: synthetic-agent-record-v1
+Asset-SHA256: 90c02669b7356057e86188c7a6d8384a72f5de6179e25834231d34b117ac20d2
+Profile: synthetic-teaching-example
+Generated-At: 2026-10-20T00:00:00Z
+GOVP-ID: GOVP-AGENT-235423bfb914
+Evidence: https://agent.example/examples/agent-record.json
+Public-Key: 4staEKGTGkDdzfV4Hia/UvjNiBy5l16bDXv1LgSrrs4=
+Signature: PiO66SVQW5IyFLrk5XdwimwMMLEwvRa49XVHLtIE0sgvjUiWkx2Ji+SafK9lYxb+WceKPPKbD0DHDE0WMBkOBg==

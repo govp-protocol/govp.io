@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Verify an agent activity record · GOVP</title><meta name="description" content="A fictional five-event example: verify the original statement, then detect changed data and a changed signed record."><meta name="theme-color" content="#07182C"><meta name="color-scheme" content="light"><meta property="og:type" content="website"><meta property="og:site_name" content="GOVP"><meta property="og:title" content="Verify an agent activity record · GOVP"><meta property="og:description" content="A fictional five-event example: verify the original statement, then detect changed data and a changed signed record."><meta property="og:image" content="https://govp.io/govp/assets/govp-social-preview.png"><meta property="og:image:width" content="1280"><meta property="og:image:height" content="640"><meta property="og:image:alt" content="GOVP — Sign once. Verify anywhere."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Verify an agent activity record · GOVP"><meta name="twitter:description" content="A fictional five-event example: verify the original statement, then detect changed data and a changed signed record."><meta name="twitter:image" content="https://govp.io/govp/assets/govp-social-preview.png"><link rel="icon" href="/favicon.svg?v=0.1.13-20261012.1"><link rel="stylesheet" href="/govp/assets/govp.css?v=0.1.13-20261012.1"></head>
+<body><header class="site-header">
+    <div class="wrap nav">
+      <a class="brand" href="/" aria-label="GOVP home"><img class="brand-mark" src="/govp/assets/govp-mark.svg?v=0.1.13-20261012.1" alt=""><span class="brand-name">GOVP</span></a>
+      <nav class="nav-links" aria-label="Primary"><a href="/govp/download.html">Install</a><a class="active" aria-current="page" href="/govp/docs.html">Documentation</a><a href="/govp/spec/govp-1.html">Specification</a><a href="/govp/verify.html">Verify</a><a href="/govp/conformance.html">Conformance</a></nav>
+      <div class="nav-right"><a class="btn btn--ghost btn--sm" href="https://github.com/govp-protocol/govp">Source</a><button class="icon-btn nav-toggle" type="button" data-nav-toggle aria-label="Open navigation" aria-expanded="false">Menu</button></div>
+    </div>
+    <nav class="mobile-menu" data-mobile-menu aria-label="Mobile"><a href="/govp/download.html">Install</a><a href="/govp/docs.html">Documentation</a><a href="/govp/spec/govp-1.html">Specification</a><a href="/govp/verify.html">Verify</a><a href="/govp/conformance.html">Conformance</a><a href="https://github.com/govp-protocol/govp">Source</a></nav>
+  </header><main><section class="section section--tight grid-bg"><div class="wrap"><div class="measure stack-16"><span class="eyebrow">GOVP 0.1.13</span><h1 class="h1">Verify an agent activity record</h1><p class="lead">A fictional five-event example: verify the original statement, then detect changed data and a changed signed record.</p></div></div></section><hr class="section-divider"><section class="section section--tight"><div class="wrap docs-layout"><article class="prose"><div class="callout"><strong>Synthetic teaching example.</strong> No language model or Gemacode containment runtime was executed. GOVP verifies the signed record and the exact supplied bytes; it does not independently observe or enforce the events described.</div>
+<h2>Follow the statement</h2>
+<ol><li><strong>Proposal A:</strong> write <code>operation-A.txt</code>.</li><li><strong>Authorization A:</strong> a fictional permission allows A.</li><li><strong>Action A:</strong> the statement declares completion and gives the output file's SHA-256.</li><li><strong>Proposal B:</strong> write a second file.</li><li><strong>Refusal B:</strong> the statement declares denial under that fictional permission.</li></ol>
+<p>The absence of an output for B is part of the constructed example. It does not demonstrate that a real prohibited action was prevented. The event JSON is a teaching format, not a normative GOVP extension.</p>
+<h2>Prepare the recipient's machine</h2>
+<p>Install the verifier while connected, then download the six files below into one folder. Once the verifier and its dependencies are installed, all three verification commands read local files without contacting the sender.</p>
+<pre><code>python -m pip install govp==0.1.13
+python -m govp self-test</code></pre>
+<ul>
+<li><a download href="/govp/examples/agent-record/agent-record.json">Original statement</a></li>
+<li><a download href="/govp/examples/agent-record/agent-record.govp.txt">Signed GOVP record</a></li>
+<li><a download href="/govp/examples/agent-record/operation-A.txt">Output file A</a></li>
+<li><a download href="/govp/examples/agent-record/demonstration-public-key.pem">Demonstration public key</a></li>
+<li><a download href="/govp/examples/agent-record/agent-record.tampered.json">Manipulated statement</a></li>
+<li><a download href="/govp/examples/agent-record/agent-record.tampered.govp.txt">Manipulated signed record</a></li>
+</ul>
+<p>This newly added sample is downloaded separately; it is not part of the existing 0.1.13 package's <code>govp examples --extract</code> output. Run the following commands from the folder containing the downloaded files.</p>
+<h2>1. Verify the original</h2>
+<pre><code>python -m govp verify agent-record.govp.txt --asset agent-record.json</code></pre>
+<p><strong>Expected: VALID, exit 0.</strong> Format, signature, GOVP-ID and asset checks pass. <code>canonical</code> remains <strong>not checked</strong> because the record is read from disk.</p>
+<h2>2. Change the declaration</h2>
+<p>The manipulated statement changes the last event's decision from <code>deny</code> to <code>allow</code>, leaving the signed record untouched.</p>
+<pre><code>python -m govp verify agent-record.govp.txt --asset agent-record.tampered.json</code></pre>
+<p><strong>Expected: INVALID, exit 1.</strong> The signature still passes; the asset check is <strong>FAIL</strong>. This establishes a byte mismatch, not a policy violation or a forged signature.</p>
+<h2>3. Change the signed record</h2>
+<p>The manipulated record changes its publisher field without creating a new signature.</p>
+<pre><code>python -m govp verify agent-record.tampered.govp.txt --asset agent-record.json</code></pre>
+<p><strong>Expected: INVALID, exit 1.</strong> The signature check is <strong>FAIL</strong>; the asset check passes. Add <code>--json</code> to preserve individual checks. Exit <code>2</code> means an input or command problem; it is not a cryptographic rejection.</p>
+<h2>Check the separately referenced output</h2>
+<p>GOVP verification of the JSON does not automatically inspect files named inside it. Calculate the output file's SHA-256 and compare it with <code>artifact_sha256</code> in event 3:</p>
+<pre><code>python -c "import hashlib,pathlib; print(hashlib.sha256(pathlib.Path('operation-A.txt').read_bytes()).hexdigest())"</code></pre>
+<p>Expected SHA-256:</p><pre><code>5b325f0e05656ae2bd093d7e711767c0329b27aaa238fe66aa91d3153ede2236</code></pre><p>The <a href="https://github.com/govp-protocol/govp/blob/main/docs/agent-record.md">repository walkthrough</a> also provides an automated comparison.</p>
+<h2>Interpret the result</h2>
+<p>The signing key was generated for this demonstration and its private key was discarded. The embedded public key and the supplied PEM are demonstration material, not an institutional trust anchor or a signature by Gemacode's CEO.</p>
+<p>The <code>agent.example</code> URLs and declared timestamp are fictional metadata. No canonical retrieval, live status, independent timestamp, institutional identity or event completeness has been established. Verification does not prove that a real agent acted, was authorized or was contained. Evaluate source evidence and recipient policy separately.</p>
+<p>The supplied bytes can be verified repeatedly. The discarded private key and its exact signature are not reproducible. This fixture does not qualify a product for production or substitute for an independent evaluator.</p>
+<p><a href="/govp/quickstart.html">Quick start</a> · <a href="/govp/verify.html">Browser verifier</a> · <a href="/govp/security.html">Security and trust boundaries</a> · <a href="https://github.com/govp-protocol/govp/tree/main/examples/agent-record">Example source files</a></p></article></div></section></main><footer class="site-footer"><div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-about"><a class="brand" href="/"><img class="brand-mark" src="/govp/assets/govp-mark.svg?v=0.1.13-20261012.1" alt=""><span class="brand-name">GOVP</span></a><p>Open protocol for independently verifiable digital artifacts.</p><p>Gemacode · Containment + Proof for autonomous agents · <a href="https://gemacode.org/">gemacode.org</a></p></div>
+      <div class="footer-col"><h4>Protocol</h4><a href="/govp/spec/govp-1.html">GOVP-1</a><a href="/govp/status.html">Status &amp; rotation</a><a href="/govp/conformance.html">Conformance</a><a href="/govp/schemas/govp-1.schema.json">JSON Schema</a></div>
+      <div class="footer-col"><h4>Use</h4><a href="/govp/download.html">Install GOVP</a><a href="/govp/quickstart.html">Quick start</a><a href="/govp/integration.html">Integration</a><a href="/govp/verify.html">Browser verifier</a></div>
+      <div class="footer-col"><h4>Project</h4><a href="/govp/governance.html">Governance</a><a href="/govp/security.html">Security</a><a href="https://github.com/govp-protocol/govp">GitHub</a></div>
+    </div>
+    <div class="footer-base"><p>GOVP 0.1.13 · Apache-2.0 · Copyright Brilyetz Holding S.L. · Gemacode is a brand of Brilyetz Holding S.L.</p><div class="footer-legal"><a href="https://github.com/govp-protocol/govp/blob/main/LICENSE">License</a><a href="https://github.com/govp-protocol/govp/blob/main/TRADEMARKS.md">Trademarks</a><a href="mailto:research@gemacode.org">Contact</a></div></div>
+  </div></footer><script src="/govp/assets/govp.js?v=0.1.13-20261012.1"></script></body></html>
