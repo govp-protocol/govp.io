@@ -1,0 +1,46 @@
+{
+  "example_format": "agent-record-teaching-fixture/1",
+  "synthetic": true,
+  "warning": "Fictional events constructed by this generator. No LLM or Gemacode runtime was executed. Not a security benchmark or production evidence.",
+  "scenario": "Illustrate a proposal, a declared authorization, a declared effect, and a refusal of a second proposal.",
+  "events": [
+    {
+      "sequence": 1,
+      "type": "proposal",
+      "proposal_id": "A",
+      "operation": "write",
+      "target": "operation-A.txt"
+    },
+    {
+      "sequence": 2,
+      "type": "authorization",
+      "proposal_id": "A",
+      "decision": "allow",
+      "policy": "fictional-permission-A"
+    },
+    {
+      "sequence": 3,
+      "type": "action",
+      "proposal_id": "A",
+      "declared_outcome": "completed",
+      "artifact": "operation-A.txt",
+      "artifact_sha256": "5b325f0e05656ae2bd093d7e711767c0329b27aaa238fe66aa91d3153ede2236"
+    },
+    {
+      "sequence": 4,
+      "type": "proposal",
+      "proposal_id": "B",
+      "operation": "write",
+      "target": "operation-B.txt"
+    },
+    {
+      "sequence": 5,
+      "type": "refusal",
+      "proposal_id": "B",
+      "decision": "deny",
+      "reason": "outside-fictional-permission",
+      "effect": "not_performed_in_this_fixture"
+    }
+  ],
+  "trust": "A demonstration key signs a fictional statement; the signature does not independently observe or enforce its events."
+}
