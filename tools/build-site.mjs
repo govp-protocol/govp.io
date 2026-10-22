@@ -51,7 +51,7 @@ function header(active = '') {
 function footer() {
   return `<footer class="site-footer"><div class="wrap">
     <div class="footer-grid">
-      <div class="footer-about"><a class="brand" href="/"><img class="brand-mark" src="${asset('/govp/assets/govp-mark.svg')}" alt=""><span class="brand-name">GOVP</span></a><p>Open protocol for independently verifiable digital artifacts.</p><p>Gemacode · Containment + Proof for autonomous agents · <a href="https://gemacode.org/">gemacode.org</a></p></div>
+      <div class="footer-about"><a class="brand" href="/"><img class="brand-mark" src="${asset('/govp/assets/govp-mark.svg')}" alt=""><span class="brand-name">GOVP</span></a><p>Open protocol for independently verifiable digital artifacts.</p><p>Gemacode = CONTAINMENT + PROOF · for autonomous agents · Verified from outside · <a href="https://gemacode.org/">gemacode.org</a></p></div>
       <div class="footer-col"><h4>Protocol</h4><a href="/govp/spec/govp-1.html">GOVP-1</a><a href="/govp/status.html">Status &amp; rotation</a><a href="/govp/conformance.html">Conformance</a><a href="/govp/schemas/govp-1.schema.json">JSON Schema</a></div>
       <div class="footer-col"><h4>Use</h4><a href="/govp/download.html">Install GOVP</a><a href="/govp/quickstart.html">Quick start</a><a href="/govp/integration.html">Integration</a><a href="/govp/verify.html">Browser verifier</a></div>
       <div class="footer-col"><h4>Project</h4><a href="/govp/governance.html">Governance</a><a href="/govp/security.html">Security</a><a href="https://github.com/govp-protocol/govp">GitHub</a></div>
